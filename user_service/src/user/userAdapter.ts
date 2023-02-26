@@ -1,4 +1,5 @@
 import { UserModel } from "../model";
+import { genSalt, hash, compare } from "bcryptjs";
 
 export interface IUserAdapter {
   user: any;
@@ -18,20 +19,23 @@ export default class UserAdapter implements IUserAdapter {
     this.user = model;
   }
   async getUserByEmail(email: string): Promise<UserModel> {
-    return await this.user.findOne({
-      where: {
-        email,
-      },
-    });
+    return await this.user.findOne({ where: { email } });
   }
 
-  async createUser(email: String, password: String): Promise<UserModel> {
+  async createUser(email: string, password: string): Promise<UserModel> {
+    const pwdHash = await this.hashUserPwd(password);
     const user = await this.user.create({
       email,
-      password,
+      password: pwdHash,
     });
     return user;
   }
+
+  async hashUserPwd(password: string) {
+    const salt = await genSalt();
+    return await hash(password, salt);
+  }
+
   async completeAccount(
     email: string,
     first_name: string,
@@ -43,11 +47,7 @@ export default class UserAdapter implements IUserAdapter {
         last_name,
         registration_completed: true,
       },
-      {
-        where: {
-          email,
-        },
-      }
+      { where: { email } }
     );
     return user;
   }

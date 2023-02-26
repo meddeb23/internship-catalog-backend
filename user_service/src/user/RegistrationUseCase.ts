@@ -58,6 +58,7 @@ class RegistrationHandler implements IRegistrationHandler {
       return makeHttpError(400, "email not verified");
     const user = await userAdapter.createUser(email, password);
     if (!user) return makeHttpError(500, "something went wrong");
+    this.cache.removeItem(email);
     return this.#formatResponse(200, {}, { user });
   }
 
