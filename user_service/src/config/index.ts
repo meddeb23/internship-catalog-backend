@@ -8,6 +8,7 @@ interface ENV {
   PORT: number | undefined;
   DB_LOGS: boolean | undefined;
   isDevMode: boolean;
+  secret: string;
 }
 
 interface Config {
@@ -15,6 +16,7 @@ interface Config {
   PORT: number;
   DB_LOGS: boolean;
   isDevMode: boolean;
+  secret: string;
 }
 
 // Loading process.env as ENV interface
@@ -25,6 +27,7 @@ const getConfig = (): ENV => {
     PORT: process.env.PORT ? Number(process.env.PORT) : 5000,
     DB_LOGS: process.env.DB_LOGS === "true" ? true : false,
     isDevMode: process.env.NODE_ENV === "production" ? false : true,
+    secret: process.env.SECRET || "some_random",
   };
 };
 

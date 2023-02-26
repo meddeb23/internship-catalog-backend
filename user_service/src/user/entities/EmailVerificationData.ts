@@ -41,7 +41,7 @@ class EmailVerificationData implements IEmailVerificationData {
 }
 
 export default class EmailVerificationList {
-  values: any = {};
+  values: { [key: string]: EmailVerificationData } = {};
 
   addItem(email: string) {
     const emailVerificationData = new EmailVerificationData(email);
@@ -56,11 +56,6 @@ export default class EmailVerificationList {
         if (value.hasExpired()) delete this.values[key];
       }
     );
-  }
-
-  getItemIdx(email: string, code: string): number {
-    this.#clearCache();
-    return this.values[this.#getKey(email)].isEqual(email, code);
   }
 
   #getKey(email: string) {
@@ -78,10 +73,13 @@ export default class EmailVerificationList {
   }
 
   verifyEmail(email: string, code: string): boolean {
-    const verifiedEmailIdx = this.getItemIdx(email, code);
-    if (verifiedEmailIdx === -1) return false;
-    this.values[verifiedEmailIdx].verified = true;
     this.#clearCache();
-    return true;
+    const key = this.#getKey(email);
+    const e = this.values[key];
+    if (e && e?.code === code) {
+      this.values[key].verified = true;
+      return true;
+    }
+    return false;
   }
 }

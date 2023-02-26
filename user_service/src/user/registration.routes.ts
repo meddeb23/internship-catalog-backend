@@ -3,7 +3,7 @@ import adaptRequest, { httpRequest } from "../helper/adapt-request";
 import {
   IRegistrationHandler,
   registrationHandler,
-} from "./RegistrationUseCase";
+} from "./RegistrationService";
 
 const router = Router();
 
