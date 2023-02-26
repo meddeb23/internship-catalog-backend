@@ -1,9 +1,9 @@
 import Debug from "debug";
 
-import { httpRequest, makeHttpError } from "../helper";
-import UserAdapter, { IUserAdapter } from "./userAdapter";
-import { UserModel } from "../model";
-import { EmailVerificationList } from "./entities";
+import { httpRequest, makeHttpError } from "../../helper";
+import UserAdapter, { IUserAdapter } from "../userAdapter";
+import { UserModel } from "../../model";
+import { EmailVerificationList } from "../entities";
 
 const debug = Debug("user:router");
 

@@ -1,9 +1,9 @@
 import { Request, Response, Router } from "express";
-import adaptRequest, { httpRequest } from "../helper/adapt-request";
+import adaptRequest, { httpRequest } from "../../helper/adapt-request";
 import {
   IRegistrationHandler,
   registrationHandler,
-} from "./RegistrationService";
+} from "../services/RegistrationService";
 
 const router = Router();
 

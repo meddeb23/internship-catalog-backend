@@ -1,7 +1,7 @@
 import { Request, Response, Router } from "express";
-import { IAuthHandler, authHandler } from "./AuthService";
-import { httpRequest } from "../helper";
-import { adaptRequest } from "../helper";
+import { IAuthHandler, authHandler } from "../services/AuthService";
+import { httpRequest } from "../../helper";
+import { adaptRequest } from "../../helper";
 
 const router = Router();
 

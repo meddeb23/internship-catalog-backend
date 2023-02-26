@@ -1,8 +1,8 @@
 import Debug from "debug";
 
-import { httpRequest, makeHttpError } from "../helper";
-import UserAdapter, { IUserAdapter } from "./userAdapter";
-import { UserModel } from "../model";
+import { httpRequest, makeHttpError } from "../../helper";
+import UserAdapter, { IUserAdapter } from "../userAdapter";
+import { UserModel } from "../../model";
 
 const debug = Debug("user_login");
 
@@ -28,7 +28,11 @@ class AuthHandler implements IAuthHandler {
 
     const token = await userAdapter.generateUserToken(user);
 
-    return this.#formatResponse(200, {}, { token, user });
+    return this.#formatResponse(
+      200,
+      {},
+      { token, user: userAdapter.formatUser(user) }
+    );
   }
 
   #formatResponse(status: number, headers: Object, data: Object) {

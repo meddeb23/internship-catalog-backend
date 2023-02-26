@@ -6,6 +6,7 @@ import { randomBytes, createCipheriv } from "crypto";
 
 export interface IUserAdapter {
   user: any;
+  formatUser: (user: UserModel) => any;
   getUserByEmail: (email: string) => Promise<UserModel>;
   createUser: (email: String, password: String) => Promise<UserModel>;
   verifyPassword: (password: string, hash: string) => Promise<boolean>;
@@ -34,7 +35,15 @@ export default class UserAdapter implements IUserAdapter {
   async getUserByEmail(email: string): Promise<UserModel> {
     return await this.user.findOne({ where: { email } });
   }
-
+  formatUser(user: UserModel) {
+    return {
+      id: user.id,
+      first_name: user.first_name,
+      last_name: user.last_name,
+      email: user.email,
+      registration_completed: user.registration_completed,
+    };
+  }
   async createUser(email: string, password: string): Promise<UserModel> {
     const pwdHash = await this.hashUserPwd(password);
     const user = await this.user.create({

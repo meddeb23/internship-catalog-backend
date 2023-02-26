@@ -6,7 +6,7 @@ import Debug from "debug";
 import morgan from "morgan";
 
 import sequelize from "./database";
-import { authRoutes, userRoute } from "./user";
+import { authRoutes, registrationRoutes } from "./user";
 import { UserModel } from "./model";
 
 const debug = Debug("app:startup");
@@ -30,7 +30,7 @@ app.get("/", (req: Request, res: Response) => {
   res.status(200).json({ message: "hello world 👋" });
 });
 
-app.use("/api/v1/user", userRoute);
+app.use("/api/v1/user", registrationRoutes);
 app.use("/api/v1/auth", authRoutes);
 
 const PORT: Number = config.PORT;
