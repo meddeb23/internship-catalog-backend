@@ -6,7 +6,7 @@ import Debug from "debug";
 import morgan from "morgan";
 
 import sequelize from "./database";
-import { authRoutes, registrationRoutes } from "./user";
+import { authRoutes, registrationRoutes } from "./app";
 import { UserModel } from "./model";
 
 const debug = Debug("app:startup");

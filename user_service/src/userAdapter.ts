@@ -1,23 +1,9 @@
-import config from "../config";
+import config from "./config";
 import { sign, verify } from "jsonwebtoken";
-import { UserModel } from "../model";
+import { UserModel } from "./model";
 import { genSalt, hash, compare } from "bcryptjs";
 import { randomBytes, createCipheriv } from "crypto";
-
-export interface IUserAdapter {
-  user: any;
-  formatUser: (user: UserModel) => any;
-  getUserByEmail: (email: string) => Promise<UserModel>;
-  createUser: (email: String, password: String) => Promise<UserModel>;
-  verifyPassword: (password: string, hash: string) => Promise<boolean>;
-  verifyToken: (token: string) => Promise<any>;
-  generateUserToken: (user: UserModel) => Promise<string>;
-  completeAccount: (
-    email: string,
-    first_name: string,
-    last_name: string
-  ) => Promise<any>;
-}
+import { IUserAdapter } from "./core/repositeries";
 
 export default class UserAdapter implements IUserAdapter {
   readonly user: typeof UserModel;

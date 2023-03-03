@@ -1,8 +1,9 @@
 import Debug from "debug";
 
 import { httpRequest, makeHttpError } from "../../helper";
-import UserAdapter, { IUserAdapter } from "../userAdapter";
+import UserAdapter from "../../userAdapter";
 import { UserModel } from "../../model";
+import { IUserAdapter } from "../../core/repositeries";
 
 const debug = Debug("user_login");
 
