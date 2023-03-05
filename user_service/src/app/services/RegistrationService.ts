@@ -60,7 +60,8 @@ class RegistrationHandler implements IRegistrationHandler {
     const user = await userAdapter.createUser(email, password);
     if (!user) return makeHttpError(500, "something went wrong");
     this.cache.removeItem(email);
-    return this.#formatResponse(200, {}, { user });
+    const token = this.userAdapter.generateUserToken(user);
+    return this.#formatResponse(200, {}, { user, token });
   }
 
   async submitPersonalInfo(req: httpRequest) {

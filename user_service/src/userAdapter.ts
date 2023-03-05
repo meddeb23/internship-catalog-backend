@@ -13,7 +13,6 @@ export default class UserAdapter implements IUserAdapter {
   }
 
   async generateUserToken(user: UserModel): Promise<string> {
-    console.log(user.id.toString());
     const token = sign({ data: user.id }, config.secret);
     return token;
   }

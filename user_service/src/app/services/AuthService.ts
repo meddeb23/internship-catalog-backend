@@ -23,7 +23,7 @@ class AuthHandler implements IAuthHandler {
     const { email, password } = req.body;
 
     const user = await userAdapter.getUserByEmail(email);
-    if (!user) return makeHttpError(400, "Unvalid Email");
+    if (!user) return makeHttpError(400, "Unvalid email");
     if (!(await userAdapter.verifyPassword(password, user.password)))
       return makeHttpError(400, "Wrong password");
 
