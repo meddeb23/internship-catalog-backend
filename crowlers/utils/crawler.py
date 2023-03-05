@@ -35,10 +35,8 @@ class Crawler:
         self.fetch(url)
         email_xpath = '//*[@id="session_key"]'
         password_xpath = '//*[@id="session_password"]'
-        self.wait.until(EC.presence_of_element_located(
-            (By.XPATH, email_xpath))).send_keys(email)
-        self.wait.until(EC.presence_of_element_located(
-            (By.XPATH, password_xpath))).send_keys(password)
+        self.__get_element_by_xpath(email_xpath).send_keys(email)
+        self.__get_element_by_xpath(password_xpath).send_keys(password)
 
     def search(self, company):
         search_xpath = '//*[@id="global-nav-typeahead"]/input'
@@ -48,7 +46,6 @@ class Crawler:
         search_element.send_keys(Keys.ENTER)
 
     def navigate_to_company_page(self, data: Company):
-        # result_cards_xpath = '//*[@id="main"]/div/div/div/div'
         card_path = '.search-nec__hero-kcard-v2 > a'
         try:
             page_link = self.__get_element_by_selector(card_path)

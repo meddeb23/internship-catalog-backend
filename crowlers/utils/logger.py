@@ -1,5 +1,4 @@
 from colorama import Fore, Style
-import logging
 import datetime
 
 
@@ -8,17 +7,16 @@ class Logger:
     DEBUG = "DEBUG"
     ERROR = "ERROR"
     INFO = "INFO"
+    EVENT = "EVENT"
 
-    def __init__(self, debug=True, filename="example.log") -> None:
-        self.is_debugging = debug
+    def __init__(self, debug='developement', filename="log/example.log") -> None:
+        self.is_debugging = debug == "developement"
         self.filename = filename
         self.color_ref = {
             'DEBUG': Fore.CYAN,
             'ERROR': Fore.RED,
             'INFO': Fore.GREEN
         }
-        # logging.basicConfig(filename=filename, level=logging.DEBUG,
-        #                     format='%(asctime)s %(levelname)s: %(message)s')
 
     def __get_message(self, message, type):
         return f"{datetime.datetime.now()} {type}: {message}\n"
@@ -36,7 +34,7 @@ class Logger:
                   Style.BRIGHT + "DEBUG", end=": ")
             print(Style.RESET_ALL + message, end=end)
 
-    def root(self, message, type="DEBUG", end="\n"):
+    def core(self, message, type="DEBUG", end="\n"):
         if (self.is_debugging and type == "DEBUG"):
             self.__print(message, type, end)
         else:
@@ -45,13 +43,13 @@ class Logger:
             self.write_to_file(message, type)
 
     def debug(self, message, end="\n"):
-        self.root(message, end=end)
+        self.core(message, end=end)
 
     def error(self, message, end="\n"):
-        self.root(message, Logger.ERROR, end)
+        self.core(message, Logger.ERROR, end)
 
     def info(self, message, end="\n"):
-        self.root(message, Logger.INFO, end)
+        self.core(message, Logger.INFO, end)
 
     def write_to_file(self, message, type):
         with open(self.filename, 'a') as f:
