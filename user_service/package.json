@@ -10,8 +10,10 @@
   "author": "Meddeb",
   "license": "MIT",
   "dependencies": {
+    "@types/amqplib": "^0.10.1",
     "@types/jsonwebtoken": "^9.0.1",
     "@types/morgan": "^1.9.3",
+    "amqplib": "^0.10.3",
     "bcryptjs": "^2.4.3",
     "debug": "^4.3.4",
     "dotenv": "^16.0.1",

@@ -9,6 +9,7 @@ interface ENV {
   DB_LOGS: boolean | undefined;
   isDevMode: boolean;
   secret: string;
+  Q_URL: string;
 }
 
 interface Config {
@@ -17,6 +18,7 @@ interface Config {
   DB_LOGS: boolean;
   isDevMode: boolean;
   secret: string;
+  Q_URL: string;
 }
 
 // Loading process.env as ENV interface
@@ -28,6 +30,7 @@ const getConfig = (): ENV => {
     DB_LOGS: process.env.DB_LOGS === "true" ? true : false,
     isDevMode: process.env.NODE_ENV === "production" ? false : true,
     secret: process.env.SECRET || "some_random",
+    Q_URL: process.env.Q_URL,
   };
 };
 

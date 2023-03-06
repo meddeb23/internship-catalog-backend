@@ -5,6 +5,9 @@ import UserAdapter from "../../userAdapter";
 import { UserModel } from "../../model";
 import { EmailVerificationList } from "../../core/entities";
 import { IUserAdapter } from "../../core/repositeries";
+import QueuePublisherInterface from "./QueuePublisherInterface";
+import { QueuePublisher } from "../../infrastructure";
+import sanitizedConfig from "../../config";
 
 const debug = Debug("user:router");
 
@@ -21,9 +24,15 @@ export interface IRegistrationHandler {
 class RegistrationHandler implements IRegistrationHandler {
   userAdapter: IUserAdapter;
   cache: EmailVerificationList;
-  constructor(userAdapter: IUserAdapter, cache: EmailVerificationList) {
+  emailSender: QueuePublisherInterface;
+  constructor(
+    userAdapter: IUserAdapter,
+    cache: EmailVerificationList,
+    emailSender: QueuePublisherInterface
+  ) {
     this.userAdapter = userAdapter;
     this.cache = cache;
+    this.emailSender = emailSender;
   }
 
   #verifyEmailFormat(email: string) {
@@ -40,6 +49,11 @@ class RegistrationHandler implements IRegistrationHandler {
     if (user) return makeHttpError(400, "This Email has been used");
     const verificationData = this.cache.addItem(email);
     // send email to the user with the verification email
+    this.emailSender.send({
+      code: verificationData.code,
+      email: verificationData.email,
+      expiration: verificationData.expiration,
+    });
     debug(this.cache.values);
     return this.#formatResponse(200, {}, { verificationData });
   }
@@ -90,5 +104,6 @@ class RegistrationHandler implements IRegistrationHandler {
 
 export const registrationHandler = new RegistrationHandler(
   userAdapter,
-  emailVerificationList
+  emailVerificationList,
+  new QueuePublisher(sanitizedConfig.Q_URL, "verificationEmail")
 );
