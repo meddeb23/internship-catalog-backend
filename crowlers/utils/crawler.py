@@ -28,21 +28,21 @@ class Crawler:
         self.driver = webdriver.Chrome(service=service, options=options)
         self.wait = WebDriverWait(self.driver, timeout)
 
-    def fetch(self, url):
+    def fetch(self, url: str):
         self.driver.get(url)
 
-    def login(self, url, email, password):
+    def login(self, url: str, email: str, password: str):
         self.fetch(url)
         email_xpath = '//*[@id="session_key"]'
         password_xpath = '//*[@id="session_password"]'
         self.__get_element_by_xpath(email_xpath).send_keys(email)
         self.__get_element_by_xpath(password_xpath).send_keys(password)
 
-    def search(self, company):
+    def search(self, company_name: str):
         search_xpath = '//*[@id="global-nav-typeahead"]/input'
         search_element = self.__get_element_by_xpath(search_xpath)
         search_element.clear()
-        search_element.send_keys(company)
+        search_element.send_keys(company_name)
         search_element.send_keys(Keys.ENTER)
 
     def navigate_to_company_page(self, data: Company):
@@ -113,9 +113,9 @@ class Crawler:
     def get_company_location(self):
         location_selector = "#main > div.org-grid__content-height-enforcer > div > div > div:nth-child(2) > div:nth-child(1) div > p"
 
-    def get_company_data(self, company_name, data: Company) -> Company:
+    def get_company_data(self, data: Company) -> Company:
         try:
-            self.search(company_name)
+            self.search(data.company_name)
             self.navigate_to_company_page(data)
             self.logger.print(
                 f"🤧 company Linkedin : {data.company_linkedin_url}")

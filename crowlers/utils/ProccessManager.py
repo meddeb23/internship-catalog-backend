@@ -17,10 +17,10 @@ class ProccessManager:
         self.data_list = df.to_dict(orient='records')[self.counter:]
 
     def __core(self):
-        for row in self.data_list:
+        idx = self.stats_manager.resume()
+        for row in self.data_list[idx:]:
             company = Company(row)
-            updated_company = self.crawler.get_company_data(
-                company.company_name, company)
+            updated_company = self.crawler.get_company_data(company)
             if updated_company:
                 # write the updated version of the company to a json file
                 self.file_manager.append(updated_company.to_dict())
@@ -39,7 +39,7 @@ class ProccessManager:
     def __handle_exceptions(self):
         # log the stats and save them to a file so they can be retireved later
         self.stats_manager.save(Company(self.data_list[self.counter]))
-        self.logger.INFO(
+        self.logger.info(
             f'stopped at index {self.stats_manager.get_next_idx()}')
         self.crawler.driver.close()
 

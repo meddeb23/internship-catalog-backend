@@ -9,7 +9,7 @@ from utils.dotenv import Dotenv
 from utils.fileManager import FileManager
 from utils.StatsManager import StatsManager
 from utils.ProccessManager import ProccessManager
-
+import sys
 
 env = Dotenv('./.env')
 
@@ -20,10 +20,12 @@ logger = Logger(debug=env.config['env'])
 file_manager = FileManager('data')
 stats_manager = StatsManager(df.shape[0])
 crawler = Crawler(env.config["driver_path"], logger)
-# crawler.login(
-#     url=env.config["url"], email=env.config["email"], password=env.config["pwd"])
-crawler.fetch(env.config["url"])
 
+if '--login' in sys.argv:
+    crawler.login(
+        url=env.config["url"], email=env.config["email"], password=env.config["pwd"])
+
+crawler.fetch(env.config["url"])
 proccess = ProccessManager(df=df, logger=logger, crawler=crawler,
                            file_manager=file_manager, stats_manager=stats_manager, )
 

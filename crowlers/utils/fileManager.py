@@ -12,7 +12,7 @@ class FileManager:
         timestamp = datetime.datetime.now().strftime('%Y-%m-%d_%H%M%S')
         return path.join(folder, f'output_{timestamp}.json')
 
-    def init_file(self):
+    def init_file(self) -> None:
         if not path.isfile(self.f):
             with open(self.f, 'w') as f:
                 json.dump([], f)
@@ -21,11 +21,11 @@ class FileManager:
         with open(self.f, 'r') as f:
             return json.load(f)
 
-    def __write(self, data):
+    def __write(self, data) -> None:
         with open(self.f, 'w') as f:
             json.dump(data, f)
 
-    def append(self, data: dict):
+    def append(self, data: dict) -> None:
         f_data = self.__read()
         f_data.append(data)
         self.__write(f_data)
