@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Lato:wght@700&family=Roboto:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <title>Verify your email address</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family: "Roboto", sans-serif;
+        background-color: #fff;
+        width: 414px;
+      }
+      h1 {
+        font-family: "Lato", sans-serif;
+        font-weight: 700;
+        font-size: 32px;
+        line-height: 38px;
+        margin-bottom: 1rem;
+      }
+
+      p {
+        font-style: normal;
+        font-weight: 400;
+        font-size: 14px;
+        line-height: 20px;
+        font-weight: 500;
+      }
+      .code {
+        font-family: "Lato";
+        font-weight: 700;
+        font-size: 36px;
+        line-height: 77px;
+        letter-spacing: 0.3em;
+      }
+      .hint {
+        font-weight: 400;
+        font-size: 10px;
+        margin: 0.25rem 0;
+        color: #626262;
+      }
+      header {
+        background: #2a6afd;
+        height: 200px;
+      }
+      footer {
+        background: #2a6afd;
+        height: 30px;
+      }
+      main {
+        padding: 1rem;
+      }
+    </style>
+  </head>
+  <body>
+    <header></header>
+    <main>
+      <h1>Verify your Email address</h1>
+      <p>
+        To complete the registration process for
+        <span style="font-weight: bold"><%= email %></span>, please verify your
+        email address by entering the following code in the mobile application
+      </p>
+      <p class="code"><%= code %></p>
+      <p>
+        This code will expire on <%= expiration %>. Please make sure to use it
+        before then.
+      </p>
+      <p class="hint">
+        If you did not sign up for our service or did not request this email,
+        please ignore it.
+      </p>
+      <p>Thank you</p>
+    </main>
+    <footer></footer>
+  </body>
+</html>
