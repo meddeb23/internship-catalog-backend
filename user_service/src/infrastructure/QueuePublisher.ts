@@ -45,6 +45,7 @@ export default class QueuePublisher implements QueuePublisherInterface {
       debug(`${this.queueName} : push new message :`);
       await this.close();
     } catch (ex) {
+      console.error("Queue Problem");
       console.error(ex);
     }
   }

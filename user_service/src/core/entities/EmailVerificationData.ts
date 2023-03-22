@@ -64,6 +64,7 @@ export default class EmailVerificationList {
 
   isVerified(email: string): null | IEmailVerificationData {
     const e = this.values[this.#getKey(email)];
+    if (!e) return null;
     return e.verified && e.email === email ? e : null;
   }
 

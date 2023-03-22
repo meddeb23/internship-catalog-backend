@@ -1,11 +1,25 @@
 import { Request, Response, Router } from "express";
+import sanitizedConfig from "../../config";
+import { EmailVerificationList } from "../../core/entities";
+import { IUserRepository } from "../../core/repositeries";
 import adaptRequest, { httpRequest } from "../../helper/adapt-request";
-import {
+import { QueuePublisher } from "../../infrastructure";
+import { UserModel } from "../../infrastructure/model";
+import UserAdapter from "../../infrastructure/repositories/userAdapter";
+import RegistrationHandler, {
   IRegistrationHandler,
-  registrationHandler,
 } from "../services/RegistrationService";
 
 const router = Router();
+
+const userAdapter: Readonly<IUserRepository> = new UserAdapter(UserModel);
+const emailVerificationList = new EmailVerificationList();
+
+const registrationHandler = new RegistrationHandler(
+  userAdapter,
+  emailVerificationList,
+  new QueuePublisher(sanitizedConfig.Q_URL, "verificationEmail")
+);
 
 router.post(
   "/verify_email",

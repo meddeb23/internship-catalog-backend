@@ -1,11 +1,10 @@
-import config from "./config";
+import config from "../../config";
 import { sign, verify } from "jsonwebtoken";
-import { UserModel } from "./model";
 import { genSalt, hash, compare } from "bcryptjs";
-import { randomBytes, createCipheriv } from "crypto";
-import { IUserAdapter } from "./core/repositeries";
+import { IUserRepository } from "../../core/repositeries";
+import { UserModel } from "../model";
 
-export default class UserAdapter implements IUserAdapter {
+export default class UserAdapter implements IUserRepository {
   readonly user: typeof UserModel;
 
   constructor(model: typeof UserModel) {

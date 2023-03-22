@@ -1,9 +1,16 @@
 import { Request, Response, Router } from "express";
-import { IAuthHandler, authHandler } from "../services/AuthService";
+import AuthHandler, { IAuthHandler } from "../services/AuthService";
 import { httpRequest } from "../../helper";
 import { adaptRequest } from "../../helper";
+import { IUserRepository } from "../../core/repositeries";
+import { UserModel } from "../../infrastructure/model";
+import UserAdapter from "../../infrastructure/repositories/userAdapter";
 
 const router = Router();
+
+const userAdapter: Readonly<IUserRepository> = new UserAdapter(UserModel);
+
+const authHandler = new AuthHandler(userAdapter);
 
 router.post("/login", makeAuthController("login", authHandler));
 

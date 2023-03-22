@@ -9,7 +9,7 @@ import morgan from "morgan";
 
 import sequelize from "./database";
 import { authRoutes, registrationRoutes } from "./app";
-import { UserModel } from "./model";
+import { UserModel } from "./infrastructure/model";
 import axios from "axios";
 import { AddressInfo } from "net";
 
@@ -45,22 +45,22 @@ app.get("/", (req: Request, res: Response) => {
 app.use("/api/v1/user", registrationRoutes);
 app.use("/api/v1/auth", authRoutes);
 
-// const PORT: Number = config.PORT;
+const PORT: Number = config.PORT;
 
 app.listen(0);
 
-var listener = app.listen(0, function () {
+var listener = app.listen(PORT, function () {
   const register_url = process.env.SERVICE_DISCOVERY_URL;
-  const { port: PORT } = listener.address() as AddressInfo;
+  // const { port: PORT } = listener.address() as AddressInfo;
 
-  const serviceRegister = () =>
-    axios
-      .post(`${register_url}/register`, { ...EndpointConfig, port: PORT })
-      .catch((err) => 0);
+  // const serviceRegister = () =>
+  //   axios
+  //     .post(`${register_url}/register`, { ...EndpointConfig, port: PORT })
+  //     .catch((err) => 0);
 
-  serviceRegister();
-  setInterval(() => {
-    serviceRegister();
-  }, 5 * 1000);
+  // serviceRegister();
+  // setInterval(() => {
+  //   serviceRegister();
+  // }, 5 * 1000);
   debug(`🚀 server is running on ${config.NODE_ENV} mode on PORT ${PORT}`);
 });

@@ -1,18 +1,11 @@
 import Debug from "debug";
 
 import { httpRequest, makeHttpError, makeHttpResponse } from "../../helper";
-import UserAdapter from "../../userAdapter";
-import { UserModel } from "../../model";
 import { EmailVerificationList } from "../../core/entities";
-import { IUserAdapter } from "../../core/repositeries";
+import { IUserRepository } from "../../core/repositeries";
 import QueuePublisherInterface from "./QueuePublisherInterface";
-import { QueuePublisher } from "../../infrastructure";
-import sanitizedConfig from "../../config";
 
 const debug = Debug("user:router");
-
-const userAdapter: Readonly<IUserAdapter> = new UserAdapter(UserModel);
-const emailVerificationList = new EmailVerificationList();
 
 export interface IRegistrationHandler {
   submitEmail: (req: httpRequest) => any;
@@ -22,11 +15,11 @@ export interface IRegistrationHandler {
 }
 
 class RegistrationHandler implements IRegistrationHandler {
-  userAdapter: IUserAdapter;
+  userAdapter: IUserRepository;
   cache: EmailVerificationList;
   emailSender: QueuePublisherInterface;
   constructor(
-    userAdapter: IUserAdapter,
+    userAdapter: IUserRepository,
     cache: EmailVerificationList,
     emailSender: QueuePublisherInterface
   ) {
@@ -45,7 +38,7 @@ class RegistrationHandler implements IRegistrationHandler {
     const { email } = req.body;
     if (!this.#verifyEmailFormat(email))
       return makeHttpError(400, "Please use your institution email");
-    const user = await userAdapter.getUserByEmail(email);
+    const user = await this.userAdapter.getUserByEmail(email);
     if (user) return makeHttpError(400, "This Email has been used");
     const verificationData = this.cache.addItem(email);
     // send email to the user with the verification email
@@ -71,7 +64,7 @@ class RegistrationHandler implements IRegistrationHandler {
     const { email, password } = req.body;
     if (!this.cache.isVerified(email))
       return makeHttpError(400, "email not verified");
-    const user = await userAdapter.createUser(email, password);
+    const user = await this.userAdapter.createUser(email, password);
     if (!user) return makeHttpError(500, "something went wrong");
     this.cache.removeItem(email);
     const token = this.userAdapter.generateUserToken(user);
@@ -80,9 +73,9 @@ class RegistrationHandler implements IRegistrationHandler {
 
   async submitPersonalInfo(req: httpRequest) {
     const { email, first_name, last_name } = req.body;
-    let user = await userAdapter.getUserByEmail(email);
+    let user = await this.userAdapter.getUserByEmail(email);
     if (!user) return makeHttpError(400, "you don't have an account");
-    user = await userAdapter.completeAccount(email, first_name, last_name);
+    user = await this.userAdapter.completeAccount(email, first_name, last_name);
     return makeHttpResponse(
       200,
       {},
@@ -91,8 +84,4 @@ class RegistrationHandler implements IRegistrationHandler {
   }
 }
 
-export const registrationHandler = new RegistrationHandler(
-  userAdapter,
-  emailVerificationList,
-  new QueuePublisher(sanitizedConfig.Q_URL, "verificationEmail")
-);
+export default RegistrationHandler;
