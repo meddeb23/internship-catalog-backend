@@ -1,6 +1,6 @@
 import { Enterprise, IEnterpriseRepository } from "../../core";
 import * as fs from "fs";
-import { EnterpriseModel } from "../../model";
+import { EnterpriseModel } from "../model";
 import { RepoError } from "../../helper";
 
 export default class EnterpriseRepository implements IEnterpriseRepository {

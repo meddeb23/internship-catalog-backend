@@ -1,4 +1,3 @@
-import { type } from "os";
 import Enterprise from "../entities/Enterprise";
 
 export default interface IEnterpriseRepository {

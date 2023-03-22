@@ -1,5 +1,10 @@
 import { Enterprise, IEnterpriseRepository } from "../../core";
-import { httpRequest, makeHttpError, RepoError } from "../../helper";
+import {
+  httpRequest,
+  makeHttpError,
+  makeHttpResponse,
+  RepoError,
+} from "../../helper";
 import EnterpriseServiceValidator from "./validation";
 
 export interface IEnterpriseService {
@@ -10,21 +15,10 @@ export interface IEnterpriseService {
   updateCompanyData(req: httpRequest): Promise<any>;
 }
 
-export default class EnterpriseService {
+export default class EnterpriseService implements IEnterpriseService {
   enterpriseRepo: IEnterpriseRepository;
   constructor(enterpriseRepo: IEnterpriseRepository) {
     this.enterpriseRepo = enterpriseRepo;
-  }
-
-  #formatResponse(status: number, data: Object, headers: Object = {}) {
-    return {
-      headers,
-      status,
-      data: {
-        ...data,
-        success: true,
-      },
-    };
   }
 
   async verifyCompany(req: httpRequest): Promise<any> {
@@ -35,7 +29,7 @@ export default class EnterpriseService {
     if (error) return makeHttpError(400, "bad id");
     const nb = await this.enterpriseRepo.verfiyCompany(id);
     if (!nb) return makeHttpError(400, "No Company updated");
-    return this.#formatResponse(201, {});
+    return makeHttpResponse(201, {});
   }
 
   async getCompanyById(req: httpRequest): Promise<any> {
@@ -46,7 +40,7 @@ export default class EnterpriseService {
     if (error) return makeHttpError(400, "bad id");
     const company = await this.enterpriseRepo.getEnterpriseById(id);
     if (!company) return makeHttpError(404, "company not found");
-    return this.#formatResponse(200, { company });
+    return makeHttpResponse(200, { company });
   }
 
   async getCompaniesPage(req: httpRequest): Promise<any> {
@@ -66,7 +60,7 @@ export default class EnterpriseService {
     );
     console.log(enp_list.length);
 
-    return this.#formatResponse(200, {
+    return makeHttpResponse(200, {
       companies: enp_list.slice(0, limit),
       isNextPage: enp_list.length > limit,
     });
@@ -86,7 +80,7 @@ export default class EnterpriseService {
         req.body.specialties
       );
       await this.enterpriseRepo.save(enp);
-      return this.#formatResponse(200, { enp });
+      return makeHttpResponse(200, { enp });
     } catch (err) {
       const e: RepoError = err as RepoError;
       console.log(e);
@@ -110,7 +104,7 @@ export default class EnterpriseService {
     }
     const enp = await this.enterpriseRepo.updateEnterprise(id, value);
     if (!enp) return makeHttpError(500, "something went wrong");
-    return this.#formatResponse(200, { enp });
+    return makeHttpResponse(200, { enp });
   }
 
   async initDbFromCrawlers() {

@@ -1,5 +1,5 @@
 import { Model, Optional, DataTypes } from "sequelize";
-import sequelize from "../database";
+import sequelize from "../../database";
 
 type EnterpriseAttributes = {
   id: number;

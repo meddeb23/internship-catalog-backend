@@ -11,19 +11,16 @@ const router = Router();
 const enterpriseRepository: IEnterpriseRepository = new EnterpriseRepository();
 const service = new EnterpriseService(enterpriseRepository);
 
-router.post("/add", makeRegistrationController("addCompany", service));
-router.post(
-  "/verify/:id",
-  makeRegistrationController("verifyCompany", service)
-);
-router.get("/", makeRegistrationController("getCompaniesPage", service));
+router.post("/add", makeEnterpriseController("addCompany", service));
+router.post("/verify/:id", makeEnterpriseController("verifyCompany", service));
 router.put(
   "/update/:id",
-  makeRegistrationController("updateCompanyData", service)
+  makeEnterpriseController("updateCompanyData", service)
 );
-router.get("/:id", makeRegistrationController("getCompanyById", service));
+router.get("/", makeEnterpriseController("getCompaniesPage", service));
+router.get("/:id", makeEnterpriseController("getCompanyById", service));
 
-function makeRegistrationController(
+function makeEnterpriseController(
   action: keyof IEnterpriseService,
   handler: IEnterpriseService
 ) {
