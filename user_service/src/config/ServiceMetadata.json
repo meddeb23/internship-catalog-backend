@@ -1,0 +1,22 @@
+{
+  "name": "user-service",
+  "version": "1.0.0",
+  "endpoints": [
+    {
+      "path": "/api/v1/user/verify_email",
+      "method": "POST"
+    },
+    {
+      "path": "/api/v1/user/request_email_verification",
+      "method": "POST"
+    },
+    {
+      "path": "/api/v1/user/create_account",
+      "method": "POST"
+    },
+    {
+      "path": "/api/v1/user/user_personal_info",
+      "method": "POST"
+    }
+  ]
+}
