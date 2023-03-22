@@ -1,6 +1,6 @@
 import Debug from "debug";
 
-import { httpRequest, makeHttpError } from "../../helper";
+import { httpRequest, makeHttpError, makeHttpResponse } from "../../helper";
 import UserAdapter from "../../userAdapter";
 import { UserModel } from "../../model";
 import { EmailVerificationList } from "../../core/entities";
@@ -55,7 +55,7 @@ class RegistrationHandler implements IRegistrationHandler {
       expiration: verificationData.expiration,
     });
     debug(this.cache.values);
-    return this.#formatResponse(200, {}, { verificationData });
+    return makeHttpResponse(200, {}, { verificationData });
   }
 
   async verifyEmail(req: httpRequest) {
@@ -64,7 +64,7 @@ class RegistrationHandler implements IRegistrationHandler {
       return makeHttpError(400, "Please use your institution email");
     if (!this.cache.verifyEmail(email, code))
       return makeHttpError(400, "unvalid credentiel");
-    return this.#formatResponse(200, {}, { message: "email verified" });
+    return makeHttpResponse(200, {}, { message: "email verified" });
   }
 
   async createAccount(req: httpRequest) {
@@ -75,7 +75,7 @@ class RegistrationHandler implements IRegistrationHandler {
     if (!user) return makeHttpError(500, "something went wrong");
     this.cache.removeItem(email);
     const token = this.userAdapter.generateUserToken(user);
-    return this.#formatResponse(200, {}, { user, token });
+    return makeHttpResponse(200, {}, { user, token });
   }
 
   async submitPersonalInfo(req: httpRequest) {
@@ -83,22 +83,11 @@ class RegistrationHandler implements IRegistrationHandler {
     let user = await userAdapter.getUserByEmail(email);
     if (!user) return makeHttpError(400, "you don't have an account");
     user = await userAdapter.completeAccount(email, first_name, last_name);
-    return this.#formatResponse(
+    return makeHttpResponse(
       200,
       {},
       { message: "account registration completed" }
     );
-  }
-
-  #formatResponse(status: number, headers: Object, data: Object) {
-    return {
-      headers,
-      status,
-      data: {
-        ...data,
-        success: true,
-      },
-    };
   }
 }
 
