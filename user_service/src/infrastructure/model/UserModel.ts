@@ -41,12 +41,12 @@ User.init(
       allowNull: true,
     },
     email: {
-      type: DataTypes.CHAR,
+      type: DataTypes.STRING(150),
       allowNull: false,
       unique: true,
     },
     password: {
-      type: DataTypes.CHAR,
+      type: DataTypes.STRING(100),
     },
     registration_completed: {
       type: DataTypes.BOOLEAN,
