@@ -20,14 +20,16 @@ app.post("/register", (req, res) => {
   const { value, error } = ServiceRegisteryRequestSchema.validate(req.body);
   if (error) return res.status(400).json(error);
 
-  const { name, version, port, endpoints } = value;
+  const { name, version, port, endpoints, url } = value;
   const a = new ip.Address6(req.socket.remoteAddress);
-
+  // console.log(a)
+  // console.log(req.socket.remoteAddress)
+  // console.log(value)
   const service = registery.register(
     name,
     version,
     port,
-    a.to4().address,
+    url,
     endpoints
   );
   res.json(service);

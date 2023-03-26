@@ -24,6 +24,7 @@ const ServiceRegisteryRequestSchema = Joi.object({
   version: Joi.string()
     .pattern(new RegExp(/^\d+\.\d+\.\d+$/))
     .required(),
+    url: Joi.string(),
   port: Joi.number().greater(2000).required(),
   endpoints: Joi.array().items(EndpointsSchema),
 });

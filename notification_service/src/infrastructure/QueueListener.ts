@@ -38,6 +38,7 @@ export default class QueueListener {
   }
   async execute(): Promise<void> {
     try {
+      debug(`connection to queue: ${this.serverUrl}`)
       await this.connect();
       await this.createChannel();
       this.channel.consume(this.queueName, (message) => {

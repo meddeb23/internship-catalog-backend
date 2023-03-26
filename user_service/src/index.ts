@@ -10,7 +10,6 @@ import morgan from "morgan";
 import sequelize from "./database";
 import { authRoutes, registrationRoutes } from "./app";
 import axios from "axios";
-import { AddressInfo } from "net";
 
 // read Endpoint configuration file
 const EndpointConfig = JSON.parse(
@@ -35,21 +34,18 @@ app.get("/", (req: Request, res: Response) => {
   res.status(200).json({ message: "hello world 👋" });
 });
 
-app.use("/api/v1/user", registrationRoutes);
-app.use("/api/v1/auth", authRoutes);
+app.use("/", registrationRoutes);
+app.use("/auth", authRoutes);
 
 const PORT: Number = config.PORT;
 
-app.listen(0);
-
-var listener = app.listen(0, function () {
+app.listen(PORT, function () {
   const register_url = process.env.SERVICE_DISCOVERY_URL;
-  const { port: PORT } = listener.address() as AddressInfo;
-
   const serviceRegister = () =>
     axios
-      .post(`${register_url}/register`, { ...EndpointConfig, port: PORT })
-      .catch((err) => debug("ERROR API registration"));
+      .post(`${register_url}/register`, { ...EndpointConfig, port: PORT, url:process.env.HOST })
+      .catch((err) => {debug("ERROR API registration");
+    console.log(err)});
 
   serviceRegister();
   setInterval(() => {

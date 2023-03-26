@@ -1,0 +1,37 @@
+version: "3"
+services:
+  gateway:
+    build: ./gateway
+    ports:
+      - "5000:5000"
+  user_service:
+    build: ./user_service
+    environment:
+      - HOST=user_service
+      - DB_HOST=mysql
+      - Q_URL=amqp://rabbitmq:5672
+      - SERVICE_DISCOVERY_URL=http://gateway:5000
+  notif:
+    build: ./notification_service
+    environment:
+      - Q_URL=amqp://rabbitmq:5672
+  rabbitmq:
+    image: rabbitmq
+    ports:
+      - "5672:5672" # AMQP port
+      - "15672:15672" # Management UI port
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest # Replace with your desired username
+      - RABBITMQ_DEFAULT_PASS=guest # Replace with your desired password
+  mysql:
+    image: mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: internship
+    volumes:
+      - ./mysql-data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+
+    

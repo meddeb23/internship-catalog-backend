@@ -40,16 +40,16 @@ export const requestFile = async (req, res, path, service) => {
 
 export const routingRequest = async (req, res, path, service) => {
   delete req.headers["content-length"];
-  const endpoint = service.endpoints.find(
-    (i) => i.path === path && i.method === req.method
-  );
-  if (!endpoint)
-    return {
-      data: {
-        message: "Service no found",
-        status: 404,
-      },
-    };
+  // const endpoint = service.endpoints.find(
+  //   (i) => i.path === path && i.method === req.method
+  // );
+  // if (!endpoint)
+  //   return {
+  //     data: {
+  //       message: "Service no found",
+  //       status: 404,
+  //     },
+  //   };
 
   const { data, headers, status } = await callService(
     req.method,
