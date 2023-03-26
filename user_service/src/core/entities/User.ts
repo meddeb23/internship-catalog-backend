@@ -4,7 +4,7 @@ export default class User {
   last_name: string | undefined;
   email: string;
   password: string;
-  email_verification_status: boolean = false;
+  registration_completed: boolean = false;
 
   constructor(
     id: number | undefined,
@@ -12,13 +12,13 @@ export default class User {
     last_name: string | undefined,
     email: string,
     password: string,
-    email_verification_status: boolean
+    registration_completed: boolean
   ) {
     this.id = id;
     this.first_name = first_name;
     this.last_name = last_name;
     this.email = email;
     this.password = password;
-    this.email_verification_status = email_verification_status;
+    this.registration_completed = registration_completed;
   }
 }

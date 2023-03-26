@@ -13,6 +13,7 @@ const userAdapter: Readonly<IUserRepository> = new UserAdapter(UserModel);
 const authHandler = new AuthHandler(userAdapter);
 
 router.post("/login", makeAuthController("login", authHandler));
+router.post("/verifyToken", makeAuthController("verifyToken", authHandler));
 
 function makeAuthController(action: keyof IAuthHandler, handler: IAuthHandler) {
   return async function controller(req: Request, res: Response) {
