@@ -1,3 +1,9 @@
+import path from "path"
+
+import dotenv from "dotenv";
+
+dotenv.config({ path: path.resolve("../.env") });
+
 import express, { json } from "express";
 import Registery from "../lib/registery.js";
 import ip from "ip-address";
@@ -60,7 +66,7 @@ app.all("/:service_name/:service_version/*", async (req, res) => {
   // res.redirect(`http://${service.ip}:${service.port}/${path}`);
   try {
     const { data, status } = await routingRequest(req, res, path, service);
-    return res.json(data).status(status);
+    return res.status(status).json(data);
   } catch (err) {
     console.log(err.stack);
     if (err.response)

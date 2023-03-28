@@ -56,7 +56,6 @@ class Registery {
 
   get(service_name, service_version) {
     this.cleanup();
-    this.log("service: ", this.getServiceKey(service_name, service_version));
     return (
       this.services[this.getServiceKey(service_name, service_version)] || null
     );

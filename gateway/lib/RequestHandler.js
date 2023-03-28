@@ -1,5 +1,6 @@
 import axios from "axios";
 import FormData from "form-data";
+import Authentication from "./AuthenticationVerifier.js";
 const callService = async (method, data, url, headers, files) => {
   if (files) {
     const formData = new FormData();
@@ -40,16 +41,24 @@ export const requestFile = async (req, res, path, service) => {
 
 export const routingRequest = async (req, res, path, service) => {
   delete req.headers["content-length"];
-  // const endpoint = service.endpoints.find(
-  //   (i) => i.path === path && i.method === req.method
-  // );
-  // if (!endpoint)
-  //   return {
-  //     data: {
-  //       message: "Service no found",
-  //       status: 404,
-  //     },
-  //   };
+  const endpoint = service.endpoints.find(
+    (i) => i.path === `/${path}`
+  );
+  if (!endpoint)
+    return {
+      data: {
+        message: "Service no found",
+        status: 404,
+      },
+    };
+  if (endpoint.auth.type === "jwt") {
+    const isAuth = await Authentication.verifyJWT(req.headers.authorization)
+    if (!isAuth) return {
+      data: { message: 'Unauthorized' },
+      status: 401
+    }
+  }
+
 
   const { data, headers, status } = await callService(
     req.method,
