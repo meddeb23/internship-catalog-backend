@@ -43,8 +43,10 @@ export default class QueuePublisher implements QueuePublisherInterface {
         Buffer.from(JSON.stringify(message))
       );
       debug(`${this.queueName} : push new message :`);
-      await this.close();
+      setTimeout(async () => await this.close(), 1500)
+      
     } catch (ex) {
+      console.error("Queue Problem");
       console.error(ex);
     }
   }

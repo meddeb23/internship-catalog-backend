@@ -1,1 +1,1 @@
-export { default as IUserAdapter } from "./UserRepositery";
+export { default as IUserRepository } from "./UserRepositery";

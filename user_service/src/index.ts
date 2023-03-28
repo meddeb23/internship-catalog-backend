@@ -9,9 +9,7 @@ import morgan from "morgan";
 
 import sequelize from "./database";
 import { authRoutes, registrationRoutes } from "./app";
-import { UserModel } from "./model";
 import axios from "axios";
-import { AddressInfo } from "net";
 
 // read Endpoint configuration file
 const EndpointConfig = JSON.parse(
@@ -30,37 +28,28 @@ app.use(morgan("tiny"));
 
 (async function () {
   await sequelize.sync({ force: false });
-  // await UserModel.create({
-  //   first_name: "joe",
-  //   last_name: "doe",
-  //   email: "email@example.com",
-  //   password: "password",
-  // });
-})().then(() => debug("init DB"));
+})().then(() => debug("🎈 Database connection established "));
 
 app.get("/", (req: Request, res: Response) => {
   res.status(200).json({ message: "hello world 👋" });
 });
 
-app.use("/api/v1/user", registrationRoutes);
-app.use("/api/v1/auth", authRoutes);
+app.use("/", registrationRoutes);
+app.use("/auth", authRoutes);
 
-// const PORT: Number = config.PORT;
+const PORT: Number = config.PORT;
 
-app.listen(0);
-
-var listener = app.listen(0, function () {
+app.listen(PORT, function () {
   const register_url = process.env.SERVICE_DISCOVERY_URL;
-  const { port: PORT } = listener.address() as AddressInfo;
-
   const serviceRegister = () =>
     axios
-      .post(`${register_url}/register`, { ...EndpointConfig, port: PORT })
-      .catch((err) => 0);
+      .post(`${register_url}/register`, { ...EndpointConfig, port: PORT, url:process.env.HOST })
+      .catch((err) => {debug("ERROR API registration");
+    console.log(err)});
 
-  serviceRegister();
-  setInterval(() => {
-    serviceRegister();
-  }, 5 * 1000);
+  // serviceRegister();
+  // setInterval(() => {
+  //   serviceRegister();
+  // }, 5 * 1000);
   debug(`🚀 server is running on ${config.NODE_ENV} mode on PORT ${PORT}`);
 });

@@ -6,6 +6,7 @@ export type httpRequest = {
   pathParams: Object;
   queryParams: Object;
   body: any;
+  headers: any
 };
 
 export default function adaptRequest(req: Request): httpRequest {
@@ -15,5 +16,6 @@ export default function adaptRequest(req: Request): httpRequest {
     pathParams: req.params,
     queryParams: req.query,
     body: req.body,
+    headers: req.headers
   });
 }

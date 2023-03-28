@@ -1,6 +1,6 @@
 import { User } from "../entities";
 
-export default interface IUserAdapter {
+export default interface IUserRepository {
   user: any;
   formatUser: (user: User) => any;
   getUserByEmail: (email: string) => Promise<User>;
