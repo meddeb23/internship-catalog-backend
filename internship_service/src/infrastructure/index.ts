@@ -1,0 +1,1 @@
+export { default as InternshipProcessRepository } from "./repositories/InternshipProcessRepository";
