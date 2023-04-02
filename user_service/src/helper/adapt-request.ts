@@ -3,10 +3,10 @@ import { Request } from "express";
 export type httpRequest = {
   path: String;
   method: String;
-  pathParams: Object;
-  queryParams: Object;
+  pathParams: any;
+  queryParams: any;
   body: any;
-  headers: any
+  headers: any;
 };
 
 export default function adaptRequest(req: Request): httpRequest {
@@ -16,6 +16,6 @@ export default function adaptRequest(req: Request): httpRequest {
     pathParams: req.params,
     queryParams: req.query,
     body: req.body,
-    headers: req.headers
+    headers: req.headers,
   });
 }

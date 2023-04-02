@@ -1,22 +1,30 @@
 import { Request, Response, Router } from "express";
 import sanitizedConfig from "../../config";
 import { EmailVerificationList } from "../../core/entities";
-import { IUserRepository } from "../../core/repositeries";
+import { IStudentRepository, IUserRepository } from "../../core/repositeries";
 import adaptRequest, { httpRequest } from "../../helper/adapt-request";
-import { QueuePublisher } from "../../infrastructure";
-import { UserModel } from "../../infrastructure/model";
-import UserAdapter from "../../infrastructure/repositories/userAdapter";
+import { QueuePublisher, UserRepoFacad } from "../../infrastructure";
+import { StudentModel, UserModel } from "../../infrastructure/model";
+import StudentRepository from "../../infrastructure/repositories/StudentRepository";
+import UserRepository from "../../infrastructure/repositories/userRepository";
 import RegistrationHandler, {
   IRegistrationHandler,
 } from "../services/RegistrationService";
 
 const router = Router();
 
-const userAdapter: Readonly<IUserRepository> = new UserAdapter(UserModel);
+const userRepository: Readonly<IUserRepository> = new UserRepository(UserModel);
+const studentRepository: Readonly<IStudentRepository> = new StudentRepository(
+  StudentModel
+);
+
+// Email Verification cache
 const emailVerificationList = new EmailVerificationList();
 
+const userRepoFacad = new UserRepoFacad(userRepository, studentRepository);
+
 const registrationHandler = new RegistrationHandler(
-  userAdapter,
+  userRepoFacad,
   emailVerificationList,
   new QueuePublisher(sanitizedConfig.Q_URL, "verificationEmail")
 );
@@ -30,7 +38,7 @@ router.post(
   makeRegistrationController("submitEmail", registrationHandler)
 );
 router.post(
-  "/create_account",
+  "/create_account/:role",
   makeRegistrationController("createAccount", registrationHandler)
 );
 router.post(

@@ -4,38 +4,51 @@ import { genSalt, hash, compare } from "bcryptjs";
 import { IUserRepository } from "../../core/repositeries";
 import { UserModel } from "../model";
 import { User } from "../../core/entities";
+import RepoError from "../../helper/RepoError";
 
-export default class UserAdapter implements IUserRepository {
+export default class UserRepository implements IUserRepository {
   readonly user: typeof UserModel;
-  private expiresIn: string = '10m'
+  private expiresIn: string = "10m";
 
   constructor(model: typeof UserModel) {
     this.user = model;
   }
 
-  #getUserEntity(user: UserModel): User{
+  #handleError(err: any, action: string) {
+    const error = new RepoError("Error in user Repository");
+    err.errors.forEach((e: any) => {
+      error.response.push({
+        message: e.message,
+        value: e.value,
+      });
+      error.stack += `\n${action}:\n\t${e.message}\n\tvalue: ${e.value}`;
+    });
+    throw error;
+  }
+  getUserEntity(user: UserModel): User {
     return new User(
       user.id,
       user.first_name,
       user.last_name,
       user.email,
       user.password,
+      user.role,
       user.registration_completed
-    )
+    );
   }
 
-  async generateUserToken(user: User) : Promise<string> {
-    const token = sign(
-      { email: user.email },
-      config.secret,
-      { expiresIn: this.expiresIn, algorithm: 'HS256' }
-    );
+  async generateUserToken(user: User): Promise<string> {
+    const token = sign({ email: user.email }, config.secret, {
+      expiresIn: this.expiresIn,
+      algorithm: "HS256",
+    });
     return token;
   }
 
-  async getUserByEmail(email: string): Promise<User> {
+  async getUserByEmail(email: string): Promise<User | null> {
     const user = await this.user.findOne({ where: { email } });
-    return this.#getUserEntity(user)
+    if (user) return this.getUserEntity(user);
+    return null;
   }
 
   formatUser(user: User) {
@@ -47,13 +60,22 @@ export default class UserAdapter implements IUserRepository {
       registration_completed: user.registration_completed,
     };
   }
-  async createUser(email: string, password: string): Promise<User> {
-    const pwdHash = await this.hashUserPwd(password);
-    const user = await this.user.create({
-      email,
-      password: pwdHash,
-    });
-    return this.#getUserEntity(user)
+  async createUser(
+    email: string,
+    password: string,
+    role: string
+  ): Promise<User> {
+    try {
+      const pwdHash = await this.hashUserPwd(password);
+      const user = await this.user.create({
+        email,
+        password: pwdHash,
+        role,
+      });
+      return this.getUserEntity(user);
+    } catch (err) {
+      this.#handleError(err, "Error creating user");
+    }
   }
 
   async hashUserPwd(password: string) {

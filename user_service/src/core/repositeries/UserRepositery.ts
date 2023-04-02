@@ -4,7 +4,7 @@ export default interface IUserRepository {
   user: any;
   formatUser: (user: User) => any;
   getUserByEmail: (email: string) => Promise<User>;
-  createUser: (email: String, password: String) => Promise<User>;
+  createUser: (email: String, password: String, role: string) => Promise<User>;
   verifyPassword: (password: string, hash: string) => Promise<boolean>;
   verifyToken: (token: string) => Promise<any>;
   generateUserToken: (user: User) => Promise<string>;

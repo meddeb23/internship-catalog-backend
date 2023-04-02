@@ -4,7 +4,11 @@
   "endpoints": [
     {
       "path": "/verify_email",
-      "method": "POST"
+      "method": "POST",
+      "auth": {
+        "type": "jwt",
+        "roles": ["user"]
+      }
     },
     {
       "path": "/request_email_verification",

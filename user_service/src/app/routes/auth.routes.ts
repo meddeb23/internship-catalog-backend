@@ -4,13 +4,13 @@ import { httpRequest } from "../../helper";
 import { adaptRequest } from "../../helper";
 import { IUserRepository } from "../../core/repositeries";
 import { UserModel } from "../../infrastructure/model";
-import UserAdapter from "../../infrastructure/repositories/userAdapter";
+import UserRepository from "../../infrastructure/repositories/userRepository";
 
 const router = Router();
 
-const userAdapter: Readonly<IUserRepository> = new UserAdapter(UserModel);
+const userRepository: Readonly<IUserRepository> = new UserRepository(UserModel);
 
-const authHandler = new AuthHandler(userAdapter);
+const authHandler = new AuthHandler(userRepository);
 
 router.post("/login", makeAuthController("login", authHandler));
 router.post("/verifyToken", makeAuthController("verifyToken", authHandler));

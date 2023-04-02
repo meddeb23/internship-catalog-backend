@@ -27,7 +27,7 @@ app.use(express.json());
 app.use(morgan("tiny"));
 
 (async function () {
-  await sequelize.sync({ force: false });
+  await sequelize.sync({ force: true });
 })().then(() => debug("🎈 Database connection established "));
 
 app.get("/", (req: Request, res: Response) => {
@@ -43,9 +43,15 @@ app.listen(PORT, function () {
   const register_url = process.env.SERVICE_DISCOVERY_URL;
   const serviceRegister = () =>
     axios
-      .post(`${register_url}/register`, { ...EndpointConfig, port: PORT, url:process.env.HOST })
-      .catch((err) => {debug("ERROR API registration");
-    console.log(err)});
+      .post(`${register_url}/register`, {
+        ...EndpointConfig,
+        port: PORT,
+        url: process.env.HOST,
+      })
+      .catch((err) => {
+        debug("ERROR API registration");
+        console.log(err);
+      });
 
   // serviceRegister();
   // setInterval(() => {

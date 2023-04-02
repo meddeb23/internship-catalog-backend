@@ -1,9 +1,10 @@
 import Debug from "debug";
 
 import { httpRequest, makeHttpError, makeHttpResponse } from "../../helper";
-import { EmailVerificationList } from "../../core/entities";
-import { IUserRepository } from "../../core/repositeries";
+import { EmailVerificationList, Roles } from "../../core/entities";
+import { IUserRepoFacad } from "../../core/repositeries";
 import QueuePublisherInterface from "./QueuePublisherInterface";
+import RepoError from "../../helper/RepoError";
 
 const debug = Debug("user:router");
 
@@ -15,15 +16,15 @@ export interface IRegistrationHandler {
 }
 
 class RegistrationHandler implements IRegistrationHandler {
-  userAdapter: IUserRepository;
+  userRepoFacad: IUserRepoFacad;
   cache: EmailVerificationList;
   emailSender: QueuePublisherInterface;
   constructor(
-    userAdapter: IUserRepository,
+    userRepoFacad: IUserRepoFacad,
     cache: EmailVerificationList,
     emailSender: QueuePublisherInterface
   ) {
-    this.userAdapter = userAdapter;
+    this.userRepoFacad = userRepoFacad;
     this.cache = cache;
     this.emailSender = emailSender;
   }
@@ -38,7 +39,7 @@ class RegistrationHandler implements IRegistrationHandler {
     const { email } = req.body;
     if (!this.#verifyEmailFormat(email))
       return makeHttpError(400, "Please use your institution email");
-    const user = await this.userAdapter.getUserByEmail(email);
+    const user = await this.userRepoFacad.UserRepo.getUserByEmail(email);
     if (user) return makeHttpError(400, "This Email has been used");
     const verificationData = this.cache.addItem(email);
     // send email to the user with the verification email
@@ -62,20 +63,35 @@ class RegistrationHandler implements IRegistrationHandler {
 
   async createAccount(req: httpRequest) {
     const { email, password } = req.body;
-    if (!this.cache.isVerified(email))
-      return makeHttpError(400, "email not verified");
-    const user = await this.userAdapter.createUser(email, password);
-    if (!user) return makeHttpError(500, "something went wrong");
-    this.cache.removeItem(email);
-    const token = this.userAdapter.generateUserToken(user);
-    return makeHttpResponse(200, {}, { user, token });
+    const { role } = req.pathParams;
+    // if (!this.cache.isVerified(email))
+    //   return makeHttpError(400, "email not verified");
+    try {
+      const user = await this.userRepoFacad.UserRepo.createUser(
+        email,
+        password,
+        role
+      );
+      if (!user) return makeHttpError(500, "something went wrong");
+      this.cache.removeItem(email);
+      const token = this.userRepoFacad.UserRepo.generateUserToken(user);
+      return makeHttpResponse(200, {}, { user, token });
+    } catch (err) {
+      const e: RepoError = err as RepoError;
+      console.log(e);
+      return makeHttpError(400, e.response[0].message);
+    }
   }
 
   async submitPersonalInfo(req: httpRequest) {
     const { email, first_name, last_name } = req.body;
-    let user = await this.userAdapter.getUserByEmail(email);
+    let user = await this.userRepoFacad.UserRepo.getUserByEmail(email);
     if (!user) return makeHttpError(400, "you don't have an account");
-    user = await this.userAdapter.completeAccount(email, first_name, last_name);
+    user = await this.userRepoFacad.UserRepo.completeAccount(
+      email,
+      first_name,
+      last_name
+    );
     return makeHttpResponse(
       200,
       {},
