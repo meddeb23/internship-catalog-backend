@@ -1,5 +1,5 @@
 import { SupervisorChoice, ISupervisorChoiceRepository } from "../../core";
-
+const { Op } = require("sequelize");
 import { ChoiceModel } from "../model";
 import { RepoError } from "../../helper";
 import { companyApi } from "../api";
@@ -51,17 +51,31 @@ export default class SupervisorChoiceRepository
   async save(ch: SupervisorChoice): Promise<void> {
     try {
       /** verify that professor id & process id exist
+       * and that its not the same supervisor
        * and that we didnt pass 3 choices & the professor limit student
        * when its the third choice step3 process is completed and step=3 */
-      const choicesNum = await ChoiceModel.count({
-        where: { internshipProcess_id: 1 },
+
+      const dublicatedSupervisor = await ChoiceModel.count({
+        where: {
+          [Op.and]: [
+            { internshipProcess_id: ch.internshipProcess_id },
+            { supervisor_id: ch.supervisor_id },
+          ],
+        },
       });
-      if (choicesNum < 3) {
-        await ChoiceModel.create({ ...ch });
-      } else if (choicesNum > 3) {
-        console.log("passed limit");
+      if (!dublicatedSupervisor) {
+        const choicesNum = await ChoiceModel.count({
+          where: { internshipProcess_id: ch.internshipProcess_id },
+        });
+        if (choicesNum < 3) {
+          await ChoiceModel.create({ ...ch });
+        } else if (choicesNum > 3) {
+          console.log("passed limit");
+        } else {
+          console.log("process completed");
+        }
       } else {
-        console.log("process completed");
+        console.log("duplicated supervisor");
       }
     } catch (err) {
       console.error("Error:", err);
