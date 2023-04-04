@@ -59,6 +59,7 @@ export default class InternshipProcessService
 
   async addInternshipProcess(req: httpRequest): Promise<any> {
     try {
+      const companyName = req.queryParams.companyName;
       const intPros = new InternshipProcess(
         req.body.student_id,
         req.body.company_id,
@@ -67,7 +68,8 @@ export default class InternshipProcessService
         req.body.intern_company_supervisor_address,
         req.body.intern_company_supervisor_phone
       );
-      await this.internProcessRepo.save(intPros);
+
+      await this.internProcessRepo.save(intPros, companyName);
       return makeHttpResponse(200, { intPros });
     } catch (err) {
       const e: RepoError = err as RepoError;

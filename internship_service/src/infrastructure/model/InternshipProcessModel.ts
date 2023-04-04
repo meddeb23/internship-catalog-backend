@@ -9,6 +9,7 @@ class Internship_process extends Model {
   declare intern_company_supervisor_name: string;
   declare intern_company_supervisor_address: string;
   declare intern_company_supervisor_phone: string;
+  declare step: number;
 }
 Internship_process.init(
   {
@@ -40,6 +41,10 @@ Internship_process.init(
     intern_company_supervisor_phone: {
       type: DataTypes.STRING,
       allowNull: false,
+    },
+    step: {
+      type: DataTypes.INTEGER,
+      defaultValue: 1,
     },
   },
   { sequelize, tableName: "internship_process" }
