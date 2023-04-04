@@ -1,8 +1,8 @@
 import { SupervisorChoice, ISupervisorChoiceRepository } from "../../core";
 const { Op } = require("sequelize");
-import { ChoiceModel } from "../model";
+import { ChoiceModel, InternshipprocessModel } from "../model";
 import { RepoError } from "../../helper";
-import { companyApi } from "../api";
+import { companyApi, processStepsUpdateApi } from "../api";
 
 export default class SupervisorChoiceRepository
   implements ISupervisorChoiceRepository
@@ -39,13 +39,24 @@ export default class SupervisorChoiceRepository
     }
   }
 
-  async getSupervisorChoicesbyStudent(
-    student_id: number
-  ): Promise<SupervisorChoice[]> {
-    const choices = await ChoiceModel.findAll({});
+  async getSupervisorChoicesbyStudent(): //student_id: number
+  Promise<SupervisorChoice[]> {
+    InternshipprocessModel.hasMany(ChoiceModel, {
+      foreignKey: "internshipProcess_id",
+    });
+    ChoiceModel.belongsTo(InternshipprocessModel, {
+      foreignKey: "internshipProcess_id",
+    });
 
-    const res = choices.map((e) => this.#GetEntityFromModel(e));
-    return res;
+    const choices = await ChoiceModel.findAll({
+      include: [InternshipprocessModel],
+      /*  where: { 
+        student_id:  , 
+      },*/
+    });
+    console.log(choices);
+    // const res = choices.map((e) => this.#GetEntityFromModel(e));
+    return;
   }
 
   async save(ch: SupervisorChoice): Promise<void> {
@@ -73,6 +84,15 @@ export default class SupervisorChoiceRepository
           console.log("passed limit");
         } else {
           console.log("process completed");
+          const [process, processerror] =
+            await processStepsUpdateApi.GetProcess(1);
+          const step = process.data.internProcess.step;
+          const [Completeprocess, error] =
+            await processStepsUpdateApi.UpdateProcessStep(1, step);
+          console.log("===============Completeprocess=====================");
+          console.log(Completeprocess);
+          console.log("====================================");
+          //
         }
       } else {
         console.log("duplicated supervisor");
