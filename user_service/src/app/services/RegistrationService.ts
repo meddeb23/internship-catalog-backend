@@ -11,7 +11,9 @@ const debug = Debug("user:router");
 export interface IRegistrationHandler {
   submitEmail: (req: httpRequest) => any;
   verifyEmail: (req: httpRequest) => any;
-  createAccount: (req: httpRequest) => any;
+  createStudentAccount: (req: httpRequest) => any;
+  createProfessorAccount: (req: httpRequest) => any;
+  createAdminAccount: (req: httpRequest) => any;
   submitPersonalInfo: (req: httpRequest) => any;
 }
 
@@ -61,7 +63,7 @@ class RegistrationHandler implements IRegistrationHandler {
     return makeHttpResponse(200, {}, { message: "email verified" });
   }
 
-  async createAccount(req: httpRequest) {
+  async createStudentAccount(req: httpRequest) {
     const { email, password } = req.body;
     const { role } = req.pathParams;
     // if (!this.cache.isVerified(email))
@@ -70,7 +72,49 @@ class RegistrationHandler implements IRegistrationHandler {
       const user = await this.userRepoFacad.UserRepo.createUser(
         email,
         password,
-        role
+        Roles.Student
+      );
+      if (!user) return makeHttpError(500, "something went wrong");
+      this.cache.removeItem(email);
+      const token = this.userRepoFacad.UserRepo.generateUserToken(user);
+      return makeHttpResponse(200, {}, { user, token });
+    } catch (err) {
+      const e: RepoError = err as RepoError;
+      console.log(e);
+      return makeHttpError(400, e.response[0].message);
+    }
+  }
+  async createProfessorAccount(req: httpRequest) {
+    const { email, password } = req.body;
+    const { role } = req.pathParams;
+    if (!this.cache.isVerified(email))
+      return makeHttpError(400, "email not verified");
+    try {
+      const user = await this.userRepoFacad.UserRepo.createUser(
+        email,
+        password,
+        Roles.Professor
+      );
+      if (!user) return makeHttpError(500, "something went wrong");
+      this.cache.removeItem(email);
+      const token = this.userRepoFacad.UserRepo.generateUserToken(user);
+      return makeHttpResponse(200, {}, { user, token });
+    } catch (err) {
+      const e: RepoError = err as RepoError;
+      console.log(e);
+      return makeHttpError(400, e.response[0].message);
+    }
+  }
+  async createAdminAccount(req: httpRequest) {
+    const { email, password } = req.body;
+    const { role } = req.pathParams;
+    if (!this.cache.isVerified(email))
+      return makeHttpError(400, "email not verified");
+    try {
+      const user = await this.userRepoFacad.UserRepo.createUser(
+        email,
+        password,
+        Roles.Admin
       );
       if (!user) return makeHttpError(500, "something went wrong");
       this.cache.removeItem(email);

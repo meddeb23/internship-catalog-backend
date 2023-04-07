@@ -8,7 +8,13 @@ import Debug from "debug";
 import morgan from "morgan";
 
 import sequelize from "./database";
-import { authRoutes, registrationRoutes } from "./app";
+import {
+  adminRegistrationRoutes,
+  authRoutes,
+  professorRegistrationRoutes,
+  emailVerification,
+  studentRegistrationRoutes,
+} from "./app";
 import axios from "axios";
 
 // read Endpoint configuration file
@@ -27,14 +33,17 @@ app.use(express.json());
 app.use(morgan("tiny"));
 
 (async function () {
-  await sequelize.sync({ force: true });
+  await sequelize.sync({ force: false });
 })().then(() => debug("🎈 Database connection established "));
 
 app.get("/", (req: Request, res: Response) => {
   res.status(200).json({ message: "hello world 👋" });
 });
 
-app.use("/", registrationRoutes);
+app.use("/", emailVerification);
+app.use("/student", studentRegistrationRoutes);
+app.use("/professor", professorRegistrationRoutes);
+app.use("/admin", adminRegistrationRoutes);
 app.use("/auth", authRoutes);
 
 const PORT: Number = config.PORT;

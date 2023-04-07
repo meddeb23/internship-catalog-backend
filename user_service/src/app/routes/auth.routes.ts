@@ -5,12 +5,13 @@ import { adaptRequest } from "../../helper";
 import { IUserRepository } from "../../core/repositeries";
 import { UserModel } from "../../infrastructure/model";
 import UserRepository from "../../infrastructure/repositories/userRepository";
+import UserCache from "../../core/entities/UserCache";
 
 const router = Router();
 
 const userRepository: Readonly<IUserRepository> = new UserRepository(UserModel);
-
-const authHandler = new AuthHandler(userRepository);
+const cache = new UserCache(userRepository);
+const authHandler = new AuthHandler(userRepository, cache);
 
 router.post("/login", makeAuthController("login", authHandler));
 router.post("/verifyToken", makeAuthController("verifyToken", authHandler));
