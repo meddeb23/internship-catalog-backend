@@ -15,8 +15,20 @@
       "method": "POST"
     },
     {
-      "path": "/create_account",
+      "path": "/create_account/student",
       "method": "POST"
+    },
+    {
+      "path": "/create_account/professor",
+      "method": "POST"
+    },
+    {
+      "path": "/create_account/admin",
+      "method": "POST",
+      "auth": {
+        "type": "jwt",
+        "roles": ["admin"]
+      }
     },
     {
       "path": "/user_personal_info",

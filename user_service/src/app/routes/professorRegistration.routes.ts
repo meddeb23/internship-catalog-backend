@@ -1,15 +1,14 @@
 import { Request, Response, Router } from "express";
-import sanitizedConfig from "../../config";
 import { EmailVerificationList } from "../../core/entities";
 import { IStudentRepository, IUserRepository } from "../../core/repositeries";
 import adaptRequest, { httpRequest } from "../../helper/adapt-request";
-import { QueuePublisher, UserRepoFacad } from "../../infrastructure";
+import { UserRepoFacad } from "../../infrastructure";
 import { StudentModel, UserModel } from "../../infrastructure/model";
 import StudentRepository from "../../infrastructure/repositories/StudentRepository";
 import UserRepository from "../../infrastructure/repositories/userRepository";
-import RegistrationHandler, {
-  IRegistrationHandler,
-} from "../services/RegistrationService";
+import ProfessorRegistrationHandler, {
+  IProfessorRegistrationHandler,
+} from "../services/ProfessorRegistrationService";
 
 const router = Router();
 
@@ -17,38 +16,29 @@ const userRepository: Readonly<IUserRepository> = new UserRepository(UserModel);
 const studentRepository: Readonly<IStudentRepository> = new StudentRepository(
   StudentModel
 );
+const userRepoFacad = new UserRepoFacad(userRepository, studentRepository);
 
 // Email Verification cache
 const emailVerificationList = new EmailVerificationList();
 
-const userRepoFacad = new UserRepoFacad(userRepository, studentRepository);
-
-const registrationHandler = new RegistrationHandler(
-  userRepoFacad,
-  emailVerificationList,
-  new QueuePublisher(sanitizedConfig.Q_URL, "verificationEmail")
-);
+const professorRegistrationHandler: IProfessorRegistrationHandler =
+  new ProfessorRegistrationHandler(userRepoFacad, emailVerificationList);
 
 router.post(
-  "/verify_email",
-  makeRegistrationController("verifyEmail", registrationHandler)
-);
-router.post(
-  "/request_email_verification",
-  makeRegistrationController("submitEmail", registrationHandler)
-);
-router.post(
-  "/create_account/:role",
-  makeRegistrationController("createAccount", registrationHandler)
+  "/create_account",
+  makeRegistrationController(
+    "createProfessorAccount",
+    professorRegistrationHandler
+  )
 );
 router.post(
   "/user_personal_info",
-  makeRegistrationController("submitPersonalInfo", registrationHandler)
+  makeRegistrationController("submitPersonalInfo", professorRegistrationHandler)
 );
 
 function makeRegistrationController(
-  action: keyof IRegistrationHandler,
-  handler: IRegistrationHandler
+  action: keyof IProfessorRegistrationHandler,
+  handler: IProfessorRegistrationHandler
 ) {
   return async function controller(req: Request, res: Response) {
     const httpRequest: httpRequest = adaptRequest(req);
