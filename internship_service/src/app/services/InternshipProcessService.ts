@@ -1,4 +1,11 @@
-import { InternshipProcess, IInternshipProcessRepository } from "../../core";
+import { Company, InternshipProcess } from "../../core/entities";
+import {
+  ICompanyRepo,
+  IInternshipProcessRepo,
+  IStudentRepo,
+  ISupervisorChoiceRepo,
+  ITechnicalDomainRepo,
+} from "../../core/repositories";
 import {
   httpRequest,
   makeHttpError,
@@ -7,22 +14,38 @@ import {
 } from "../../helper";
 import IntershipProcessServiceValidator from "./validation";
 
-export interface IInternshipProcessService {
-  addInternshipProcess: (req: httpRequest) => Promise<any>;
-  getInternshipProcessById(req: httpRequest): Promise<any>;
-  getInternshipProcessPage(req: httpRequest): Promise<any>;
-  updateInternshipProcessData(req: httpRequest): Promise<any>;
+export interface IProcessApplicationService {
+  submitApplication: (req: httpRequest) => Promise<any>;
+  getApplicationById(req: httpRequest): Promise<any>;
+  updateApplicationData(req: httpRequest): Promise<any>;
 }
 
-export default class InternshipProcessService
-  implements IInternshipProcessService
+export default class StudentProcessApplicationService
+  implements IProcessApplicationService
 {
-  internProcessRepo: IInternshipProcessRepository;
-  constructor(internProcessRepo: IInternshipProcessRepository) {
+  internProcessRepo: IInternshipProcessRepo;
+  companyRepo: ICompanyRepo;
+  studentRepo: IStudentRepo;
+  choiceRepo: ISupervisorChoiceRepo;
+  domainRepo: ITechnicalDomainRepo;
+  supervisorRepo: ISupervisorChoiceRepo;
+  constructor(
+    internProcessRepo: IInternshipProcessRepo,
+    companyRepo: ICompanyRepo,
+    studentRepo: IStudentRepo,
+    choiceRepo: ISupervisorChoiceRepo,
+    domainRepo: ITechnicalDomainRepo,
+    supervisorRepo: ISupervisorChoiceRepo
+  ) {
     this.internProcessRepo = internProcessRepo;
+    this.companyRepo = companyRepo;
+    this.studentRepo = studentRepo;
+    this.choiceRepo = choiceRepo;
+    this.domainRepo = domainRepo;
+    this.supervisorRepo = supervisorRepo;
   }
 
-  async getInternshipProcessById(req: httpRequest): Promise<any> {
+  async getApplicationById(req: httpRequest): Promise<any> {
     const {
       value: { id },
       error,
@@ -30,46 +53,55 @@ export default class InternshipProcessService
 
     if (error) return makeHttpError(400, "bad id");
 
-    const internProcess = await this.internProcessRepo.getInternshipProcessById(
-      id
-    );
+    const internProcess = await this.internProcessRepo.getById(id);
     if (!internProcess)
       return makeHttpError(404, "internship process not found");
     return makeHttpResponse(200, { internProcess });
   }
 
-  async getInternshipProcessPage(req: httpRequest): Promise<any> {
-    const page =
-      isNaN(Number(req.queryParams.page)) || req.queryParams.page < 1
-        ? 1
-        : req.queryParams.page;
-    const limit =
-      isNaN(Number(req.queryParams.limit)) || req.queryParams.limit < 2
-        ? 10
-        : req.queryParams.limit;
-    const int_process_list =
-      await this.internProcessRepo.getInternshipProcessPage(page, limit);
-    console.log(int_process_list.length);
-
-    return makeHttpResponse(200, {
-      intershipProcess: int_process_list.slice(0, limit),
-      isNextPage: int_process_list.length > limit,
-    });
-  }
-
-  async addInternshipProcess(req: httpRequest): Promise<any> {
+  async submitApplication(req: httpRequest): Promise<any> {
     try {
-      const companyName = req.queryParams.companyName;
-      const intPros = new InternshipProcess(
-        req.body.student_id,
-        req.body.company_id,
-        req.body.intern_department,
-        req.body.intern_company_supervisor_name,
-        req.body.intern_company_supervisor_address,
-        req.body.intern_company_supervisor_phone
-      );
+      //check comany
 
-      await this.internProcessRepo.save(intPros, companyName);
+      const intPros = new InternshipProcess(
+        req.body.codeSujet,
+        req.body.student,
+        req.body.company,
+        req.body.department,
+        req.body.universatySupervisor,
+        req.body.companySupervisorName,
+        req.body.companySupervisorAddress,
+        req.body.companySupervisorPhone,
+        req.body.choices
+      );
+      //student & codeSujet
+
+      if (intPros.company === null) {
+        const newCompany = new Company(
+          req.queryParams.companyName,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        );
+        await this.companyRepo.save(newCompany);
+        intPros.company = newCompany;
+      } else {
+        // Check if a company with the given object already exists
+
+        const company = await this.companyRepo.getById(intPros.company.id);
+        if (company!) {
+          console.log("company does not exist");
+          return;
+        }
+      }
+
+      await this.internProcessRepo.save(intPros);
       return makeHttpResponse(200, { intPros });
     } catch (err) {
       const e: RepoError = err as RepoError;
@@ -78,7 +110,7 @@ export default class InternshipProcessService
     }
   }
 
-  async updateInternshipProcessData(req: httpRequest): Promise<any> {
+  async updateApplicationData(req: httpRequest): Promise<any> {
     const {
       value: { id },
       error: id_error,
@@ -94,10 +126,7 @@ export default class InternshipProcessService
       error.message = error.message.replace(/"/g, "");
       return makeHttpError(400, error.message);
     }
-    const internProc = await this.internProcessRepo.updateInternshipProcess(
-      id,
-      value
-    );
+    const internProc = await this.internProcessRepo.update(id, value);
     if (!internProc) return makeHttpError(500, "something went wrong");
     return makeHttpResponse(200, { internProc });
   }

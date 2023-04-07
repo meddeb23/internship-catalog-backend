@@ -1,18 +1,11 @@
+import Professor from "./Professor";
+
 export default class SupervisorChoice {
   id?: number;
+  supervisor: Professor;
 
-  internshipProcess_id: number;
-  supervisor_id: number;
-  is_validated: boolean;
-  constructor(
-    internshipProcess_id: number,
-    supervisor_id: number,
-    is_validated: boolean = false,
-    id?: number
-  ) {
+  constructor(supervisor: Professor, id?: number) {
     this.id = id;
-    this.internshipProcess_id = internshipProcess_id;
-    this.supervisor_id = supervisor_id;
-    this.is_validated = is_validated;
+    this.supervisor = supervisor;
   }
 }

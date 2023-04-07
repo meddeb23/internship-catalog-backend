@@ -1,31 +1,56 @@
 import { Request, Response, Router } from "express";
-import { IInternshipProcessRepository } from "../../core";
 import { adaptRequest, httpRequest } from "../../helper";
-import { InternshipProcessRepository } from "../../infrastructure";
-import InternshipProcessService, {
-  IInternshipProcessService,
+import {
+  CompanyRepo,
+  DepartementRepo,
+  InternshipProcessRepo,
+  StudentRepo,
+  SupervisorChoiceRepo,
+  SupervisorRepo,
+} from "../../infrastructure";
+import StudentProcessApplicationService, {
+  IProcessApplicationService,
 } from "../services/InternshipProcessService";
+import {
+  ICompanyRepo,
+  IInternshipProcessRepo,
+  IStudentRepo,
+  ISupervisorChoiceRepo,
+  ISupervisorRepo,
+  ITechnicalDomainRepo,
+} from "../../core/repositories";
 
 const router = Router();
 
-const internshipProcessRepository: IInternshipProcessRepository =
-  new InternshipProcessRepository();
-const service = new InternshipProcessService(internshipProcessRepository);
+const processRepo: IInternshipProcessRepo = new InternshipProcessRepo();
+const companyRepo: ICompanyRepo = new CompanyRepo();
+const choiseRepo: ISupervisorChoiceRepo = new SupervisorChoiceRepo();
+const supervisorRepo: ISupervisorRepo = new SupervisorRepo();
+const studentRepo: IStudentRepo = new StudentRepo();
+const domainRepo: ITechnicalDomainRepo = new DepartementRepo();
 
-router.post("/add", makeInternshipController("addInternshipProcess", service));
-router.put(
-  "/update/:id",
-  makeInternshipController("updateInternshipProcessData", service)
+const service = new StudentProcessApplicationService(
+  processRepo,
+  companyRepo,
+  studentRepo,
+  choiseRepo,
+  domainRepo,
+  supervisorRepo
 );
-router.get("/", makeInternshipController("getInternshipProcessPage", service));
+
+router.post("/add", makeInternshipController("submitApplication", service));
+router.put(
+  "/update/:codeSujet",
+  makeInternshipController("updateApplicationData", service)
+);
 router.get(
-  "/:id",
-  makeInternshipController("getInternshipProcessById", service)
+  "/:codeSujet",
+  makeInternshipController("getApplicationById", service)
 );
 
 function makeInternshipController(
-  action: keyof IInternshipProcessService,
-  handler: IInternshipProcessService
+  action: keyof IProcessApplicationService,
+  handler: IProcessApplicationService
 ) {
   return async function controller(req: Request, res: Response) {
     const httpRequest: httpRequest = adaptRequest(req);
