@@ -4,26 +4,26 @@
   "endpoints": [
     {
       "path": "/verify_email",
-      "method": "POST",
-      "auth": {
-        "type": "jwt",
-        "roles": ["user"]
-      }
+      "method": "POST"
     },
     {
       "path": "/request_email_verification",
       "method": "POST"
     },
     {
-      "path": "/create_account/student",
+      "path": "/student/create_account",
       "method": "POST"
     },
     {
-      "path": "/create_account/professor",
+      "path": "/professor/create_account",
       "method": "POST"
     },
     {
-      "path": "/create_account/admin",
+      "path": "/auth/login",
+      "method": "POST"
+    },
+    {
+      "path": "/admin/create_account",
       "method": "POST",
       "auth": {
         "type": "jwt",
@@ -31,8 +31,12 @@
       }
     },
     {
-      "path": "/user_personal_info",
-      "method": "POST"
+      "path": "/student/user_personal_info",
+      "method": "POST",
+      "auth": {
+        "type": "jwt",
+        "roles": ["student"]
+      }
     }
   ]
 }

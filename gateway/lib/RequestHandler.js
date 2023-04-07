@@ -48,14 +48,18 @@ export const routingRequest = async (req, res, path, service) => {
     return {
       data: {
         message: "Service no found",
-        status: 404,
       },
+      status: 404,
     };
-  if (endpoint.auth.type === "jwt") {
+  if (endpoint.auth?.type === "jwt") {
     const isAuth = await Authentication.verifyJWT(req.headers.authorization)
     if (!isAuth) return {
       data: { message: 'Unauthorized' },
       status: 401
+    }
+    if (!endpoint.auth.roles.includes(isAuth.user.role)) return {
+      data: { message: 'Forbidden' },
+      status: 403
     }
   }
 

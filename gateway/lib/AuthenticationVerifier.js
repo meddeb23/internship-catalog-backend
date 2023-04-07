@@ -6,11 +6,10 @@ class Authentication {
         const [res, error] = await authApi.VerifyToken(token)
         if (error) {
             console.log('error' + error)
-            return false
+            return null
         }
-        console.log(res)
-        if (res.status !== 200) return false
-        return true
+        if (res.status !== 200) return null
+        return res.data
     }
 
 }

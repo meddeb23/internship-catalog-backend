@@ -59,12 +59,12 @@ app.listen(PORT, function () {
       })
       .catch((err) => {
         debug("ERROR API registration");
-        console.log(err);
+        // console.log(err.response);
       });
 
-  // serviceRegister();
-  // setInterval(() => {
-  //   serviceRegister();
-  // }, 5 * 1000);
+  serviceRegister();
+  setInterval(() => {
+    serviceRegister();
+  }, 5 * 1000);
   debug(`🚀 server is running on ${config.NODE_ENV} mode on PORT ${PORT}`);
 });

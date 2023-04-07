@@ -24,7 +24,10 @@ const registery = new Registery();
 
 app.post("/register", (req, res) => {
   const { value, error } = ServiceRegisteryRequestSchema.validate(req.body);
-  if (error) return res.status(400).json(error);
+  if (error) {
+    console.log(error)
+    return res.status(400).json(error);
+  }
 
   const { name, version, port, endpoints, url } = value;
   const a = new ip.Address6(req.socket.remoteAddress);
@@ -68,10 +71,11 @@ app.all("/:service_name/:service_version/*", async (req, res) => {
     const { data, status } = await routingRequest(req, res, path, service);
     return res.status(status).json(data);
   } catch (err) {
-    console.log(err.stack);
-    if (err.response)
+    console.log('stack: ', err.stack);
+    if (err.response) {
       return res.status(err.response.status).send(err.response.data);
-    return res.json({ stack: err.stack + "🍥" }).status(500);
+    }
+    return res.status(500).json({ stack: err.stack + "🍥" });
   }
 });
 

@@ -15,6 +15,7 @@ services:
     build: ./notification_service
     environment:
       - Q_URL=amqp://rabbitmq:5672
+      - NODE_ENV=production
   rabbitmq:
     image: rabbitmq
     ports:
@@ -30,8 +31,6 @@ services:
       MYSQL_ROOT_PASSWORD: password
       MYSQL_DATABASE: internship
     volumes:
-      - ./mysql-data:/var/lib/mysql
+      - ./volumes/mysql_data:/var/lib/mysql
     ports:
       - "3306:3306"
-
-    

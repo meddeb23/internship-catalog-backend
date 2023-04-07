@@ -11,7 +11,7 @@ const EndpointsSchema = Joi.object({
     type: Joi.string()
       .required()
       .valid(...["jwt"]),
-    roles: Joi.array().items(Joi.string().valid("admin", "user")),
+    roles: Joi.array().items(Joi.string().valid("admin", "student", 'professor')),
   }),
 });
 
@@ -24,7 +24,7 @@ const ServiceRegisteryRequestSchema = Joi.object({
   version: Joi.string()
     .pattern(new RegExp(/^\d+\.\d+\.\d+$/))
     .required(),
-    url: Joi.string(),
+  url: Joi.string(),
   port: Joi.number().greater(2000).required(),
   endpoints: Joi.array().items(EndpointsSchema),
 });
