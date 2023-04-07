@@ -1,8 +1,8 @@
 import { InternshipProcess, IInternshipProcessRepository } from "../../core";
 
-import axios from "axios";
 import { InternshipprocessModel } from "../model";
 import { RepoError } from "../../helper";
+import { companyApi } from "../api";
 
 export default class InternshipProcessRepository
   implements IInternshipProcessRepository
@@ -27,6 +27,7 @@ export default class InternshipProcessRepository
       i.intern_company_supervisor_name,
       i.intern_company_supervisor_address,
       i.intern_company_supervisor_phone,
+      i.step,
       i.id
     );
   }
@@ -55,11 +56,28 @@ export default class InternshipProcessRepository
     return res;
   }
 
-  async save(enp: InternshipProcess): Promise<void> {
+  async save(enp: InternshipProcess, companyName: String): Promise<void> {
     try {
-      await InternshipprocessModel.create({ ...enp });
+      const idCompany = enp.company_id;
+      // If company_id is null, create a new company with the given name in path param
+      if (idCompany === null) {
+        const company_name = companyName;
+        const [newCompany, error] = await companyApi.SaveCompany(company_name);
+        enp.company_id = newCompany.data.enp.company_id;
+        // Create the new internship with the updated company_id
+        await InternshipprocessModel.create({ ...enp });
+      } else {
+        // Check if a company with the given id already exists
+        const [existingCompany, error] = await companyApi.GetCompany(idCompany);
+        if (existingCompany.status !== 200) {
+          console.log("company does not exist");
+          return;
+        } else {
+          await InternshipprocessModel.create({ ...enp });
+        }
+      }
     } catch (err) {
-      this.#handleError(err, "Error inserting internship process");
+      console.error("Error:", err);
     }
   }
 
