@@ -5,7 +5,7 @@ import morgan from "morgan";
 import sequelize from "./infrastructure/database";
 
 // Import Controlers
-import { InternshipProcessRoutes, SuperviserChoiceRoutes } from "./app";
+import { InternshipProcessRoutes } from "./app";
 
 const debug = Debug("app:startup");
 
@@ -22,8 +22,8 @@ app.get("/", (req: Request, res: Response) => {
   res.status(200).json({ message: "internship process service🎓" });
 });
 
-app.use("/step2/", InternshipProcessRoutes);
-app.use("/step3/", SuperviserChoiceRoutes);
+app.use("/", InternshipProcessRoutes);
+
 const PORT: Number = config.PORT;
 
 app.listen(PORT, () =>

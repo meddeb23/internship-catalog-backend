@@ -1,30 +1,38 @@
+import SupervisorChoice from "./SupervisorChoice";
+import Student from "./Student";
+import Company from "./Company";
+import TechnicalDomain from "./TechnicalDomain";
+import Professor from "./Professor";
 export default class InternshipProcess {
-  id?: number;
-  student_id: number;
-  company_id: number | null; //if id is null then we gonna create new company.
-  intern_department: string;
-  intern_company_supervisor_name: string;
-  intern_company_supervisor_address: string;
-  intern_company_supervisor_phone: string;
-  step: number;
+  codeSujet: String;
+  student: Student;
+  company: Company | null;
+  department: TechnicalDomain;
+  companySupervisorName: string;
+  companySupervisorAddress: string;
+  companySupervisorPhone: string;
+  choices: Array<SupervisorChoice>;
+  universatySupervisor: Professor | null;
 
   constructor(
-    student_id: number,
-    company_id: number | null,
-    intern_department: string,
-    intern_company_supervisor_name: string,
-    intern_company_supervisor_address: string,
-    intern_company_supervisor_phone: string,
-    step: number = 1,
-    id?: number
+    student: Student,
+    company: Company | null,
+    department: TechnicalDomain,
+    companySupervisorName: string,
+    companySupervisorAddress: string,
+    companySupervisorPhone: string,
+    choices: Array<SupervisorChoice>,
+    universatySupervisor: Professor | null,
+    codeSujet: String
   ) {
-    this.id = id;
-    this.student_id = student_id;
-    this.company_id = company_id;
-    this.intern_department = intern_department;
-    this.intern_company_supervisor_name = intern_company_supervisor_name;
-    this.intern_company_supervisor_address = intern_company_supervisor_address;
-    this.intern_company_supervisor_phone = intern_company_supervisor_phone;
-    this.step = step;
+    this.codeSujet = codeSujet;
+    this.student = student;
+    this.company = company;
+    this.department = department;
+    this.companySupervisorName = companySupervisorName;
+    this.companySupervisorAddress = companySupervisorAddress;
+    this.companySupervisorPhone = companySupervisorPhone;
+    this.choices = choices;
+    this.universatySupervisor = universatySupervisor;
   }
 }
