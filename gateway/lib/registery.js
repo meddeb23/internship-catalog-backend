@@ -1,5 +1,6 @@
 import chalk from "chalk";
 import Service from "./Service.js";
+import logger from "./Logger.js";
 
 class Registery {
   constructor() {
@@ -12,8 +13,14 @@ class Registery {
     const now = Date.now();
     Object.keys(this.services).forEach((k) => {
       if (now - this.services[k].registertime > this.timeout) {
-        delete this.services[k];
         this.log("registery removed", this.services[k]);
+        logger.info(`registery removed`, {
+          service_name: this.services[k].service_name,
+          service_version: this.services[k].service_version,
+          service_port: this.services[k].service_port,
+          service_address: this.services[k].service_address,
+        })
+        delete this.services[k];
       }
     });
   }
@@ -31,6 +38,12 @@ class Registery {
   ) {
     this.cleanup();
     const key = this.getServiceKey(service_name, service_version);
+    if (!this.services[key]) logger.info(`service registration`, {
+      service_name,
+      service_version,
+      service_port,
+      service_address,
+    })
     this.services[key] = new Service(
       service_name,
       service_version,

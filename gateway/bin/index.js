@@ -13,13 +13,16 @@ import helmet from "helmet";
 
 import { routingRequest, requestFile } from "../lib/RequestHandler.js";
 import ServiceRegisteryRequestSchema from "../helper/ServiceRegisteryRequestValidation.js";
+import logger from "../lib/Logger.js"
 
 const app = express();
 app.use(json());
-app.use(morgan("dev"));
 app.use(fileUpload());
 app.use(helmet());
-
+app.use((req, res, next) => {
+  req.logger = logger;
+  next();
+});
 const registery = new Registery();
 
 app.post("/register", (req, res) => {
@@ -43,6 +46,7 @@ app.post("/register", (req, res) => {
   );
   res.json(service);
 });
+app.use(morgan("dev"));
 
 app.get("/public/*", async (req, res) => {
   const { 0: path } = req.params;
@@ -64,8 +68,10 @@ app.get("/public/*", async (req, res) => {
 app.all("/:service_name/:service_version/*", async (req, res) => {
   const { service_name, service_version, 0: path } = req.params;
   const service = registery.get(service_name, service_version);
-  if (!service)
+  if (!service) {
+    req.logger.warn(`service not found, service name: ${service_name}-${service_version}`)
     return res.status(404).json({ message: "service not found 😢" });
+  }
   // res.redirect(`http://${service.ip}:${service.port}/${path}`);
   try {
     const { data, status } = await routingRequest(req, res, path, service);
@@ -81,4 +87,4 @@ app.all("/:service_name/:service_version/*", async (req, res) => {
 
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => console.log(`getway is runnning on port ${PORT}`));
+app.listen(PORT, () => logger.info(`getway is runnning on port ${PORT}`));
