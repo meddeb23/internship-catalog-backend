@@ -1,3 +1,7 @@
+import dotenv from "dotenv";
+import path from "path";
+
+dotenv.config({ path: path.resolve(__dirname, "../config/.env") });
 import Debug from "debug";
 const debug = Debug("scripts:initDB");
 
@@ -10,8 +14,8 @@ const enterpriseRepository: IEnterpriseRepository = new EnterpriseRepository();
 const Service = new EnterpriseService(enterpriseRepository);
 (async function () {
   await sequelize.sync({ force: true });
-})().then(() => {
+})().then(async () => {
   debug("🚚 Inserting companies into Database");
-  Service.initDbFromCrawlers();
+  await Service.initDbFromCrawlers();
   debug("✅ Done");
 });

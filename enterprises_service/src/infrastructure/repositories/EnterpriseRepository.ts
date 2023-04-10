@@ -6,6 +6,7 @@ import { RepoError } from "../../helper";
 export default class EnterpriseRepository implements IEnterpriseRepository {
   #handleError(err: any, action: string) {
     const error = new RepoError("Error in Enterprise Repository");
+    if (!err.errors) throw err;
     err.errors.forEach((e: any) => {
       error.response.push({
         message: e.message,
