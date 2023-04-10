@@ -1,6 +1,6 @@
 import { Student, User } from "../../core/entities";
 import { IStudentRepository } from "../../core/repositeries";
-import { StudentModel } from "../model";
+import { StudentModel, UserModel } from "../model";
 
 export default class StudentRepository implements IStudentRepository {
   readonly student: typeof StudentModel;
@@ -23,16 +23,43 @@ export default class StudentRepository implements IStudentRepository {
     );
   }
 
+  async getStudent(studentId: number): Promise<Student> {
+    const student: any = await this.student.findByPk(studentId, {
+      include: [
+        {
+          model: UserModel,
+          // attributes: ["first_name","last_name"]
+        },
+      ],
+    });
+    return new Student(
+      student.User.id,
+      student.User.first_name,
+      student.User.last_name,
+      student.User.email,
+      student.User.password,
+      student.User.role,
+      student.User.registration_completed,
+      student.address,
+      student.major
+    );
+  }
+
+  formatUser(student: Student): any {
+    return student;
+  }
+
   async createStudent(
     major: String,
     address: String,
     user: User
-  ): Promise<User> {
+  ): Promise<Student> {
     const student = await this.student.create({
       address,
       major,
       userId: user.id,
     });
+    if (!student) return null;
     return this.#getStudentEntity(user, student);
   }
 }

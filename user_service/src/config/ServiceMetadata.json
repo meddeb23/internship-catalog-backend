@@ -37,6 +37,14 @@
         "type": "jwt",
         "roles": ["student"]
       }
+    },
+    {
+      "path": "/user/me",
+      "method": "GET",
+      "auth": {
+        "type": "jwt",
+        "roles": ["student"]
+      }
     }
   ]
 }

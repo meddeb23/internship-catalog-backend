@@ -3,3 +3,4 @@ export { default as studentRegistrationRoutes } from "./routes/studentRegistrati
 export { default as professorRegistrationRoutes } from "./routes/professorRegistration.routes";
 export { default as adminRegistrationRoutes } from "./routes/AdminRegistration.routes";
 export { default as authRoutes } from "./routes/auth.routes";
+export { default as userRoutes } from "./routes/User.routes";

@@ -14,6 +14,7 @@ import {
   professorRegistrationRoutes,
   emailVerification,
   studentRegistrationRoutes,
+  userRoutes,
 } from "./app";
 import axios from "axios";
 
@@ -45,6 +46,7 @@ app.use("/student", studentRegistrationRoutes);
 app.use("/professor", professorRegistrationRoutes);
 app.use("/admin", adminRegistrationRoutes);
 app.use("/auth", authRoutes);
+app.use("/user", userRoutes);
 
 const PORT: Number = config.PORT;
 

@@ -31,8 +31,8 @@ class AuthHandler implements IAuthHandler {
 
     return makeHttpResponse(
       200,
-      { token },
-      { user: this.UserRepository.formatUser(user) }
+      { user: this.UserRepository.formatUser(user) },
+      { token }
     );
   }
   async verifyToken(req: httpRequest) {
