@@ -27,7 +27,9 @@ export default class Enterprise {
     this.company_name = company_name;
     this.company_address = company_address;
     this.company_city = company_city;
-    this.company_phone = company_phone.replace(/\s+/g, "");
+    this.company_phone = company_phone
+      ? company_phone.replace(/\s+/g, "")
+      : company_phone;
     this.company_website = company_website;
     this.company_logo_url = company_logo_url;
     this.company_linkedin_url = company_linkedin_url;
