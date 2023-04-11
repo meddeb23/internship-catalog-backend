@@ -2,11 +2,14 @@ version: "3"
 services:
   gateway:
     build: ./gateway
+    environment:
+      - IDENTITY_SERVICE=user_service:5001
     ports:
       - "5000:5000"
   user_service:
     build: ./user_service
     environment:
+      - PORT=5001
       - HOST=user_service
       - DB_HOST=mysql
       - Q_URL=amqp://rabbitmq:5672
@@ -16,6 +19,8 @@ services:
     environment:
       - Q_URL=amqp://rabbitmq:5672
       - NODE_ENV=production
+      - DEBUG=app:startup,user:router,QueueListnner
+      - DB_LOGS=false
   rabbitmq:
     image: rabbitmq
     ports:

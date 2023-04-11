@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "http://192.168.106.128:5001",
+  baseURL: `http://${process.env.IDENTITY_SERVICE || "192.168.106.128:5001"}`,
   timeout: 1000 * 20,
 });
 
