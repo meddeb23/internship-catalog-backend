@@ -19,8 +19,7 @@ const studentRepository: Readonly<IStudentRepository> = new StudentRepository(
 );
 
 // Email Verification cache
-const emailVerificationList = new EmailVerificationList();
-
+export const emailVerificationList = new EmailVerificationList();
 const userRepoFacad = new UserRepoFacad(userRepository, studentRepository);
 
 const registrationHandler: IRegistrationHandler = new RegistrationHandler(
@@ -48,5 +47,4 @@ function makeRegistrationController(
     res.status(status).set(headers).json(data);
   };
 }
-
 export default router;

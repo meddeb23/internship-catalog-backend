@@ -33,7 +33,6 @@ class RegistrationHandler implements IRegistrationHandler {
 
   #verifyEmailFormat(email: string) {
     const reg = new RegExp(/[a-z]+@issatso\.u-sousse\.tn/);
-    debug(`Testing email : ${email} => ${reg.test(email)}`);
     return reg.test(email);
   }
 
@@ -56,6 +55,7 @@ class RegistrationHandler implements IRegistrationHandler {
 
   async verifyEmail(req: httpRequest) {
     const { email, code } = req.body;
+    debug(this.cache);
     if (!this.#verifyEmailFormat(email))
       return makeHttpError(400, "Please use your institution email");
     if (!this.cache.verifyEmail(email, code))

@@ -9,6 +9,7 @@ import UserRepository from "../../infrastructure/repositories/userRepository";
 import StudentRegistrationHandler, {
   IStudentRegistrationHandler,
 } from "../services/StudentRegistrationService";
+import { emailVerificationList } from "./emailVerification.routes";
 
 const router = Router();
 
@@ -19,7 +20,7 @@ const studentRepository: Readonly<IStudentRepository> = new StudentRepository(
 const userRepoFacad = new UserRepoFacad(userRepository, studentRepository);
 
 // Email Verification cache
-const emailVerificationList = new EmailVerificationList();
+// const emailVerificationList = new EmailVerificationList();
 
 const studentRegistrationHandler = new StudentRegistrationHandler(
   userRepoFacad,
