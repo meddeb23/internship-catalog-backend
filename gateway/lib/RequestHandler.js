@@ -39,15 +39,38 @@ export const requestFile = async (req, res, path, service) => {
   return { data, status };
 };
 
+const getMatchedEndpoint = (endpoints, path, reqMethod) => {
+  const resource = path.split('/').filter(Boolean);
+
+  for (const endpoint of endpoints) {
+    const { path, method, params } = endpoint;
+
+    let pathParams = path.split('/').filter(Boolean);
+
+    if (method === reqMethod && pathParams.length === resource.length) {
+
+      const paramMap = {};
+      const matches = pathParams.every((param, index) => {
+        if (param.startsWith(':')) {
+          paramMap[param.slice(1)] = resource[index];
+          return true;
+        } else {
+          return param === resource[index];
+        }
+      });
+      if (matches) return endpoint
+    }
+  }
+  return null
+}
+
 export const routingRequest = async (req, res, path, service) => {
   delete req.headers["content-length"];
-  const endpoint = service.endpoints.find(
-    (i) => i.path === `/${path}`
-  );
+  const endpoint = getMatchedEndpoint(service.endpoints, path, req.method)
   if (!endpoint)
     return {
       data: {
-        message: "Service no found",
+        message: "endpoint no found",
       },
       status: 404,
     };
