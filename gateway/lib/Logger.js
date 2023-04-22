@@ -1,38 +1,52 @@
 import winston, { format } from "winston"
 
-const { combine, timestamp, metadata, printf } = format;
+const levels = {
+    error: 0,
+    warn: 1,
+    info: 2,
+    http: 3,
+    debug: 4,
+}
 
-// Create transport for logging errors to separate files
-const errorTransport = new winston.transports.File({
-    filename: "logs/error.log",
-    level: "error",
-});
+const level = () => {
+    const env = process.env.NODE_ENV || 'development'
+    const isDevelopment = env === 'development'
+    return isDevelopment ? 'debug' : 'warn'
+}
 
-// Create transport for logging all logs to a global file
-const globalTransport = new winston.transports.File({
-    filename: "logs/all.log",
-});
+const colors = {
+    error: 'red',
+    warn: 'yellow',
+    info: 'green',
+    http: 'magenta',
+    debug: 'white',
+}
 
-const logFormat = format.combine(
-    format.timestamp(),
-    format.printf(({ timestamp, level, message, metadata }) => {
-        let logMessage = `${timestamp} [${level}] ${message}`;
-        if (metadata && Object.keys(metadata).length > 0) {
-            logMessage += `, ${JSON.stringify(metadata)}`;
-        }
-        return logMessage;
-    })
-);
+winston.addColors(colors)
 
-var config = winston.config;
-const logger = winston.createLogger({
-    format: combine(
-        metadata(),
-        timestamp(),
-        printf(info => {
-            return `[${info.timestamp}] [${info.level.toUpperCase()}] ${info.message} ${info.metadata && Object.keys(info.metadata).length ? "\n" + JSON.stringify(info.metadata) : ""}`
-        })
+const customFormat = format.combine(
+    format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss:ms' }),
+    format.colorize({ all: true }),
+    format.printf(
+        (info) => `${info.timestamp} [${info.level.toUpperCase()}]: ${info.message} ${info.metadata && Object.keys(info.metadata).length ? "\n" + JSON.stringify(info.metadata) : ""}`,
     ),
+)
+
+
+const transports = [
+    new winston.transports.File({ filename: "logs/all.log", }),
+    new winston.transports.File({ filename: "logs/error.log", level: "error", }),
+    new winston.transports.Console()
+]
+
+const logger = winston.createLogger({
+    // format: combine(
+    //     metadata(),
+    //     timestamp(),
+    //     printf(info => {
+    //         return `[${info.timestamp}] [${info.level.toUpperCase()}] ${info.message} ${info.metadata && Object.keys(info.metadata).length ? "\n" + JSON.stringify(info.metadata) : ""}`
+    //     })
+    // ),
     // formatter: logFormat,
 
     // function (options) {
@@ -41,7 +55,9 @@ const logger = winston.createLogger({
     //         (options.message ? options.message : '') +
     //         (options.meta && Object.keys(options.meta).length ? '\n\t' + JSON.stringify(options.meta) : '');
     // },
-    transports: [errorTransport, globalTransport, new winston.transports.Console(),],
+    levels,
+    format: customFormat,
+    transports,
 });
 
 export default logger

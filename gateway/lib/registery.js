@@ -13,13 +13,7 @@ class Registery {
     const now = Date.now();
     Object.keys(this.services).forEach((k) => {
       if (now - this.services[k].registertime > this.timeout) {
-        this.log("registery removed", this.services[k]);
-        logger.info(`registery removed`, {
-          service_name: this.services[k].service_name,
-          service_version: this.services[k].service_version,
-          service_port: this.services[k].service_port,
-          service_address: this.services[k].service_address,
-        })
+        logger.info(`service removed: ${this.services[k].service_name} => ${this.services[k].service_address}:${this.services[k].service_port}`)
         delete this.services[k];
       }
     });
@@ -38,12 +32,7 @@ class Registery {
   ) {
     this.cleanup();
     const key = this.getServiceKey(service_name, service_version);
-    if (!this.services[key]) logger.info(`service registration`, {
-      service_name,
-      service_version,
-      service_port,
-      service_address,
-    })
+    if (!this.services[key]) logger.info(`service registration: ${service_name} => ${service_address}:${service_port}`)
     this.services[key] = new Service(
       service_name,
       service_version,
@@ -51,8 +40,6 @@ class Registery {
       service_address,
       endpoints
     );
-
-    // this.log("service added", this.services[key]);
     return this.services[key];
   }
 
@@ -61,9 +48,9 @@ class Registery {
 
     const service =
       this.services[this.getServiceKey(service_name, service_version)];
+    if (!service) return
+    logger.info(`service removed: ${service.service_name} => ${service.service_address}:${service.service_port}`)
     delete this.services[this.getServiceKey(service_name, service_version)];
-    this.log("service removed", service);
-
     return service;
   }
 

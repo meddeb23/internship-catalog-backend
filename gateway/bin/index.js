@@ -23,6 +23,11 @@ app.use((req, res, next) => {
   req.logger = logger;
   next();
 });
+app.use(morgan("common", {
+  // stream: { write: (message) => logger.http(message.trim()) },
+  skip: (req, res) => req.path === "/register"
+}));
+
 const registery = new Registery();
 
 app.post("/register", (req, res) => {
@@ -34,9 +39,6 @@ app.post("/register", (req, res) => {
 
   const { name, version, port, endpoints, url } = value;
   const a = new ip.Address6(req.socket.remoteAddress);
-  // console.log(a)
-  // console.log(req.socket.remoteAddress)
-  // console.log(value)
   const service = registery.register(
     name,
     version,
@@ -46,7 +48,6 @@ app.post("/register", (req, res) => {
   );
   res.json(service);
 });
-app.use(morgan("dev"));
 
 app.get("/public/*", async (req, res) => {
   const { 0: path } = req.params;
@@ -72,7 +73,6 @@ app.all("/:service_name/:service_version/*", async (req, res) => {
     req.logger.warn(`service not found, service name: ${service_name}-${service_version}`)
     return res.status(404).json({ message: "service not found 😢" });
   }
-  // res.redirect(`http://${service.ip}:${service.port}/${path}`);
   try {
     const { data, status } = await routingRequest(req, res, path, service);
     return res.status(status).json(data);
