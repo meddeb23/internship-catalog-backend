@@ -1,9 +1,11 @@
 import Joi from "joi";
 
 const EndpointsSchema = Joi.object({
+  description: Joi.string(),
   path: Joi.string()
-    .pattern(new RegExp(/^\/([a-zA-Z0-9-_~.]+\/?)*$/))
+    .pattern(new RegExp(/^\/(:?[a-zA-Z0-9-_~.]+\/?)*$/))
     .required(),
+  params: Joi.array().items(Joi.string()),
   method: Joi.string()
     .valid(...["POST", "GET", "DELETE", "PUT", "PATCH"])
     .required(),
