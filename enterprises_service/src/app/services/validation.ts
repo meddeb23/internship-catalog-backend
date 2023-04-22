@@ -1,6 +1,9 @@
-import Joi from 'joi';
+import Joi from "joi";
 
-export default class EnterpriseServiceValidator {
+const numIdSchema = Joi.number().greater(0).required();
+const positiveInteger = Joi.number().greater(0);
+
+export class EnterpriseServiceValidator {
   static idSchema = Joi.object({
     id: Joi.number().greater(0).required(),
   });
@@ -15,5 +18,22 @@ export default class EnterpriseServiceValidator {
     overview: Joi.string(),
     specialties: Joi.string().alphanum().min(3).max(255),
     is_verified: Joi.boolean(),
+  });
+}
+export class ReviewServiceValidator {
+  static idSchema = numIdSchema;
+  static Schema = {
+    rating: Joi.number().greater(-1).less(6).required(),
+    content: Joi.string(),
+    companyId: numIdSchema,
+    userId: numIdSchema,
+  };
+  static reviewSchema = Joi.object({
+    ...ReviewServiceValidator.Schema,
+  });
+  static updateSchema = Joi.object({
+    rating: ReviewServiceValidator.Schema.rating,
+    content: ReviewServiceValidator.Schema.rating,
+    userId: numIdSchema,
   });
 }

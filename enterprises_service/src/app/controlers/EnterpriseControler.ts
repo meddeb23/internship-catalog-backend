@@ -5,10 +5,13 @@ import { EnterpriseRepository } from "../../infrastructure";
 import EnterpriseService, {
   IEnterpriseService,
 } from "../services/EnterpriseService";
+import { EnterpriseModel } from "../../infrastructure/model";
 
 const router = Router();
 
-const enterpriseRepository: IEnterpriseRepository = new EnterpriseRepository();
+const enterpriseRepository: IEnterpriseRepository = new EnterpriseRepository(
+  EnterpriseModel
+);
 const service = new EnterpriseService(enterpriseRepository);
 
 router.post("/add", makeEnterpriseController("addCompany", service));

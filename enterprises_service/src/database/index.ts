@@ -1,6 +1,10 @@
-import { Sequelize } from "sequelize";
-
-console.log(process.env.DB_HOST);
+// import { Sequelize } from "sequelize";
+import { Sequelize } from "sequelize-typescript";
+import {
+  EnterpriseModel,
+  ReviewsModel,
+  UserModel,
+} from "../infrastructure/model";
 
 const sequelize = new Sequelize({
   dialect: "mysql",
@@ -11,4 +15,15 @@ const sequelize = new Sequelize({
   logging: true,
 });
 
-export default sequelize;
+sequelize
+  .authenticate()
+  .then(() => console.log("Connection has been established successfully."))
+  .catch((error) => console.error("Unable to connect to the database:", error));
+export const sequelizeModel = sequelize;
+async function connectToDB(force: boolean = false) {
+  sequelize.addModels([EnterpriseModel, ReviewsModel, UserModel]);
+  EnterpriseModel.sync({ force });
+  ReviewsModel.sync({ force: false });
+  // await sequelize.sync({ force });
+}
+export default connectToDB;

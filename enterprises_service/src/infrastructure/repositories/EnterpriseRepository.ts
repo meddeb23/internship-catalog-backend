@@ -1,9 +1,16 @@
 import { Enterprise, IEnterpriseRepository } from "../../core";
-import * as fs from "fs";
+import fs from "fs";
 import { EnterpriseModel } from "../model";
 import { RepoError } from "../../helper";
+import { threadId } from "worker_threads";
 
 export default class EnterpriseRepository implements IEnterpriseRepository {
+  readonly enterprise: typeof EnterpriseModel;
+
+  constructor(enterpriseModel: typeof EnterpriseModel) {
+    this.enterprise = enterpriseModel;
+  }
+
   #handleError(err: any, action: string) {
     const error = new RepoError("Error in Enterprise Repository");
     if (!err.errors) throw err;
@@ -35,7 +42,7 @@ export default class EnterpriseRepository implements IEnterpriseRepository {
 
   async getEnterpriseById(enp_id: number): Promise<Enterprise> {
     try {
-      const e = await EnterpriseModel.findByPk(enp_id);
+      const e = await this.enterprise.findByPk(enp_id);
       if (!e) return null;
       return this.#GetEntityFromModel(e);
     } catch (err) {
@@ -46,15 +53,11 @@ export default class EnterpriseRepository implements IEnterpriseRepository {
 
   async verfiyCompany(enp_id: number): Promise<number> {
     try {
-      const [nb_rows] = await EnterpriseModel.update(
+      const [affectedCount] = await this.enterprise.update(
         { is_verified: true },
-        {
-          where: {
-            id: enp_id,
-          },
-        }
+        { where: { id: enp_id } }
       );
-      return nb_rows;
+      return affectedCount;
     } catch (error) {}
   }
 
@@ -65,15 +68,14 @@ export default class EnterpriseRepository implements IEnterpriseRepository {
   ): Promise<Enterprise[]> {
     const where: any = {};
     if (isVerify) where.is_verified = isVerify;
-    console.log(isVerify, where);
+    console.log(typeof page, typeof limit);
     const enps = await EnterpriseModel.findAll({
       offset: (page - 1) * limit,
       limit: limit + 1,
       where,
     });
-
-    const res = enps.map((e) => this.#GetEntityFromModel(e));
-    return res;
+    const formatedCompanies = enps.map((e) => this.#GetEntityFromModel(e));
+    return formatedCompanies;
   }
 
   async save(enp: Enterprise): Promise<void> {

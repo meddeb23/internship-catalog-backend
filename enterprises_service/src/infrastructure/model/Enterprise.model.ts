@@ -1,23 +1,53 @@
-import { Model, Optional, DataTypes } from "sequelize";
+// import { Model, Optional, DataTypes } from "sequelize";
 import sequelize from "../../database";
+import {
+  Table,
+  Column,
+  Model,
+  HasMany,
+  DataType,
+  ForeignKey,
+  BelongsTo,
+} from "sequelize-typescript";
+import Review from "./Review.model";
 
-type EnterpriseAttributes = {
-  id: number;
+@Table
+class Enterprise extends Model<Enterprise> {
+  @Column
   company_name: string;
-  company_address: string | null;
-  company_city: string | null;
-  company_phone: string | null;
-  company_website: string | null;
-  company_logo_url: string | null;
-  company_linkedin_url: string | null;
-  overview: string | null;
-  specialties: string | null;
+
+  @Column
+  company_address: string;
+
+  @Column
+  company_city: string;
+
+  @Column
+  company_phone: string;
+
+  @Column
+  company_website: string;
+
+  @Column
+  company_logo_url: string;
+
+  @Column
+  company_linkedin_url: string;
+
+  @Column({ type: DataType.TEXT })
+  overview: string;
+
+  @Column({ type: DataType.TEXT })
+  specialties: string;
+
+  @Column
   is_verified: boolean;
-};
 
-type EnterpriseCreationAttributes = Optional<EnterpriseAttributes, "id">;
-
-class Enterprise extends Model /*<EnterpriseAttributes, EnterpriseCreationAttributes> */ {
+  @HasMany(() => Review)
+  reviews: Review[];
+}
+/*
+class Enterprise extends Model  {
   declare id: number;
   declare company_name: string;
   declare company_address: string | null;
@@ -80,5 +110,5 @@ Enterprise.init(
   },
   { sequelize, tableName: "enterprises" }
 );
-
+*/
 export default Enterprise;

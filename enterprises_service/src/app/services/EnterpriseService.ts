@@ -5,7 +5,7 @@ import {
   makeHttpResponse,
   RepoError,
 } from "../../helper";
-import EnterpriseServiceValidator from "./validation";
+import { EnterpriseServiceValidator as EnterpriseValidator } from "./validation";
 
 export interface IEnterpriseService {
   addCompany: (req: httpRequest) => Promise<any>;
@@ -25,7 +25,7 @@ export default class EnterpriseService implements IEnterpriseService {
     const {
       value: { id },
       error,
-    } = EnterpriseServiceValidator.idSchema.validate(req.pathParams);
+    } = EnterpriseValidator.idSchema.validate(req.pathParams);
     if (error) return makeHttpError(400, "bad id");
     const nb = await this.enterpriseRepo.verfiyCompany(id);
     if (!nb) return makeHttpError(400, "No Company updated");
@@ -36,22 +36,27 @@ export default class EnterpriseService implements IEnterpriseService {
     const {
       value: { id },
       error,
-    } = EnterpriseServiceValidator.idSchema.validate(req.pathParams);
+    } = EnterpriseValidator.idSchema.validate(req.pathParams);
     if (error) return makeHttpError(400, "bad id");
     const company = await this.enterpriseRepo.getEnterpriseById(id);
     if (!company) return makeHttpError(404, "company not found");
     return makeHttpResponse(200, { company });
   }
+  getValidNumberParam(
+    param: string,
+    minValue: number,
+    defaultValue?: number
+  ): number {
+    const value = Number(param);
+    if (isNaN(value) || value < minValue) {
+      return defaultValue || minValue;
+    }
+    return value;
+  }
 
   async getCompaniesPage(req: httpRequest): Promise<any> {
-    const page =
-      isNaN(Number(req.queryParams.page)) || req.queryParams.page < 1
-        ? 1
-        : req.queryParams.page;
-    const limit =
-      isNaN(Number(req.queryParams.limit)) || req.queryParams.limit < 2
-        ? 10
-        : req.queryParams.limit;
+    const page = this.getValidNumberParam(req.queryParams.page, 1);
+    const limit = this.getValidNumberParam(req.queryParams.limit, 10);
     const is_verify = req.queryParams.verifyOnly === "true";
     const enp_list = await this.enterpriseRepo.getEnterprisePage(
       page,
@@ -92,10 +97,10 @@ export default class EnterpriseService implements IEnterpriseService {
     const {
       value: { id },
       error: id_error,
-    } = EnterpriseServiceValidator.idSchema.validate(req.pathParams);
+    } = EnterpriseValidator.idSchema.validate(req.pathParams);
     if (id_error) return makeHttpError(400, "bad id");
     const { value, error } =
-      EnterpriseServiceValidator.updateEnterpriseDataSchema.validate(req.body);
+      EnterpriseValidator.updateEnterpriseDataSchema.validate(req.body);
     if (error) {
       if (error.message.includes("company_phone"))
         error.message = "unvalide phone number";
