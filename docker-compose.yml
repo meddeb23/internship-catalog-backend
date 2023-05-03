@@ -8,9 +8,21 @@ services:
       - "5000:5000"
   user_service:
     build: ./user_service
+    depends_on:
+      - mysql
     environment:
       - PORT=5001
       - HOST=user_service
+      - DB_HOST=mysql
+      - Q_URL=amqp://rabbitmq:5672
+      - SERVICE_DISCOVERY_URL=http://gateway:5000
+  enterprises_service:
+    build: ./enterprises_service
+    depends_on:
+      - mysql
+    environment:
+      - PORT=5001
+      - HOST=enterprises_service
       - DB_HOST=mysql
       - Q_URL=amqp://rabbitmq:5672
       - SERVICE_DISCOVERY_URL=http://gateway:5000
