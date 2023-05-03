@@ -1,0 +1,103 @@
+{
+  "name": "company-service",
+  "version": "1.0.0",
+  "endpoints": [
+    {
+      "description": "Add a new company",
+      "path": "/company/add",
+      "method": "POST",
+      "auth": {
+        "type": "jwt",
+        "roles": ["admin"]
+      }
+    },
+    {
+      "description": "Verify a company by ID",
+      "path": "/company/verify/:id",
+      "method": "POST",
+      "params": ["id"],
+      "auth": {
+        "type": "jwt",
+        "roles": ["admin"]
+      }
+    },
+    {
+      "description": "Update company data by ID",
+      "path": "/company/update/:id",
+      "method": "PUT",
+      "params": ["id"],
+      "auth": {
+        "type": "jwt",
+        "roles": ["admin"]
+      }
+    },
+    {
+      "description": "Get a page of companies",
+      "path": "/company",
+      "method": "GET",
+      "auth": {
+        "type": "jwt",
+        "roles": ["admin", "student"]
+      }
+    },
+    {
+      "description": "Get a company by ID",
+      "path": "/company/:id",
+      "method": "GET",
+      "params": ["id"],
+      "auth": {
+        "type": "jwt",
+        "roles": ["admin", "student"]
+      }
+    },
+    {
+      "description": "Add a review for a company",
+      "path": "/review",
+      "method": "POST",
+      "auth": {
+        "type": "jwt",
+        "roles": ["student", "admin"]
+      }
+    },
+    {
+      "description": "Get reviews written by a student",
+      "path": "/review/student/:userId",
+      "method": "GET",
+      "params": ["userId"],
+      "auth": {
+        "type": "jwt",
+        "roles": ["student", "admin"]
+      }
+    },
+    {
+      "description": "Get reviews for a company",
+      "path": "/review/company/:companyId",
+      "method": "GET",
+      "params": ["companyId"],
+      "auth": {
+        "type": "jwt",
+        "roles": ["student", "admin"]
+      }
+    },
+    {
+      "description": "Get a review by ID",
+      "path": "/review/:id",
+      "method": "GET",
+      "params": ["id"],
+      "auth": {
+        "type": "jwt",
+        "roles": ["admin"]
+      }
+    },
+    {
+      "description": "Delete a review by ID",
+      "path": "/review/:reviewId",
+      "method": "DELETE",
+      "params": ["reviewId"],
+      "auth": {
+        "type": "jwt",
+        "roles": ["admin"]
+      }
+    }
+  ]
+}

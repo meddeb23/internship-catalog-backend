@@ -15,7 +15,7 @@ const enterpriseRepository: IEnterpriseRepository = new EnterpriseRepository(
   EnterpriseModel
 );
 const Service = new EnterpriseService(enterpriseRepository);
-connectToDB(true).then(async () => {
+connectToDB().then(async () => {
   debug("🚚 Inserting companies into Database");
   await Service.initDbFromCrawlers();
   debug("✅ Done");
