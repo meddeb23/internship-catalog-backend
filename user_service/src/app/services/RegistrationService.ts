@@ -8,7 +8,7 @@ import RepoError from "../../helper/RepoError";
 
 const debug = Debug("user:router");
 
-export interface IRegistrationHandler {
+export interface IRegistrationService {
   submitEmail: (req: httpRequest) => any;
   verifyEmail: (req: httpRequest) => any;
   createStudentAccount: (req: httpRequest) => any;
@@ -17,7 +17,7 @@ export interface IRegistrationHandler {
   submitPersonalInfo: (req: httpRequest) => any;
 }
 
-class RegistrationHandler implements IRegistrationHandler {
+class RegistrationService implements IRegistrationService {
   userRepoFacad: IUserRepoFacad;
   cache: EmailVerificationList;
   emailSender: QueuePublisherInterface;
@@ -66,8 +66,8 @@ class RegistrationHandler implements IRegistrationHandler {
   async createStudentAccount(req: httpRequest) {
     const { email, password } = req.body;
     const { role } = req.pathParams;
-    // if (!this.cache.isVerified(email))
-    //   return makeHttpError(400, "email not verified");
+    if (!this.cache.isVerified(email))
+      return makeHttpError(400, "email not verified");
     try {
       const user = await this.userRepoFacad.UserRepo.createUser(
         email,
@@ -138,10 +138,10 @@ class RegistrationHandler implements IRegistrationHandler {
     );
     return makeHttpResponse(
       200,
-      {},
+      { user },
       { message: "account registration completed" }
     );
   }
 }
 
-export default RegistrationHandler;
+export default RegistrationService;

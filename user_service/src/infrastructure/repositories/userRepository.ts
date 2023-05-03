@@ -3,7 +3,7 @@ import { sign, verify } from "jsonwebtoken";
 import { genSalt, hash, compare } from "bcryptjs";
 import { IUserRepository } from "../../core/repositeries";
 import { UserModel } from "../model";
-import { User } from "../../core/entities";
+import { Roles, User } from "../../core/entities";
 import RepoError from "../../helper/RepoError";
 
 export default class UserRepository implements IUserRepository {
@@ -63,7 +63,7 @@ export default class UserRepository implements IUserRepository {
   async createUser(
     email: string,
     password: string,
-    role: string
+    role: Roles
   ): Promise<User> {
     try {
       const pwdHash = await this.hashUserPwd(password);
@@ -97,7 +97,7 @@ export default class UserRepository implements IUserRepository {
     first_name: string,
     last_name: string
   ): Promise<any> {
-    const user = await this.user.update(
+    const [affectedCount] = await this.user.update(
       {
         first_name,
         last_name,
@@ -105,6 +105,8 @@ export default class UserRepository implements IUserRepository {
       },
       { where: { email } }
     );
-    return user;
+    if (!affectedCount) return null;
+    const user = await this.getUserByEmail(email);
+    return this.formatUser(user);
   }
 }

@@ -1,65 +1,56 @@
-import { Model, DataTypes } from "sequelize";
 import { Roles } from "../../core/entities";
-import sequelize from "../../database";
+import {
+  AutoIncrement,
+  Column,
+  DataType,
+  Default,
+  Is,
+  Model,
+  PrimaryKey,
+  Table,
+  Unique,
+  Validate,
+} from "sequelize-typescript";
 
-class User extends Model {
-  public id: number;
-  public first_name: string;
-  public last_name: string;
-  public email: string;
-  public password: string;
-  public registration_completed: boolean;
-  public role: Roles;
-  public readonly createdAt!: Date;
-  public readonly updatedAt!: Date;
+@Table({ tableName: "users" })
+class User extends Model<User> {
+  @AutoIncrement
+  @PrimaryKey
+  @Column(DataType.INTEGER.UNSIGNED)
+  public id!: number;
 
-  public validateRole(value: string): void {
+  @Column(DataType.STRING(50))
+  public first_name?: string;
+
+  @Column(DataType.STRING(50))
+  public last_name?: string;
+
+  @Unique
+  @Column(DataType.STRING(150))
+  public email!: string;
+
+  @Column(DataType.STRING(100))
+  public password?: string;
+
+  @Default(Roles.Student)
+  @Is("UserRole", (value: string) => {
     if (!Object.values(Roles).includes(value as Roles)) {
       throw new Error(
-        'Role should be either "student" or "admin" or professor'
+        'Role should be either "student" or "admin" or "professor"'
       );
     }
-  }
-}
-User.init(
-  {
-    id: {
-      type: DataTypes.INTEGER.UNSIGNED,
-      autoIncrement: true,
-      primaryKey: true,
-    },
-    first_name: {
-      type: DataTypes.STRING(50),
-      allowNull: true,
-    },
-    last_name: {
-      type: DataTypes.STRING(50),
-      allowNull: true,
-    },
-    email: {
-      type: DataTypes.STRING(150),
-      allowNull: false,
-      unique: true,
-    },
-    password: {
-      type: DataTypes.STRING(100),
-    },
-    role: {
-      type: DataTypes.STRING(10),
-      allowNull: false,
-      defaultValue: Roles.Student,
-      validate: {
-        validateRole(value: string): void {
-          this.validateRole(value);
-        },
-      },
-    },
-    registration_completed: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: false,
-    },
-  },
-  { sequelize, tableName: "users" }
-);
+  })
+  @Column(DataType.STRING(10))
+  public role!: Roles;
 
+  @Default(false)
+  @Column(DataType.BOOLEAN)
+  public registration_completed!: boolean;
+
+  @Column
+  public readonly createdAt!: Date;
+
+  @Column
+  public readonly updatedAt!: Date;
+}
 export default User;

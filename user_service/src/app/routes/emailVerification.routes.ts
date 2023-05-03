@@ -8,7 +8,7 @@ import { StudentModel, UserModel } from "../../infrastructure/model";
 import StudentRepository from "../../infrastructure/repositories/StudentRepository";
 import UserRepository from "../../infrastructure/repositories/userRepository";
 import RegistrationHandler, {
-  IRegistrationHandler,
+  IRegistrationService,
 } from "../services/RegistrationService";
 
 const router = Router();
@@ -22,7 +22,7 @@ const studentRepository: Readonly<IStudentRepository> = new StudentRepository(
 export const emailVerificationList = new EmailVerificationList();
 const userRepoFacad = new UserRepoFacad(userRepository, studentRepository);
 
-const registrationHandler: IRegistrationHandler = new RegistrationHandler(
+const registrationHandler: IRegistrationService = new RegistrationHandler(
   userRepoFacad,
   emailVerificationList,
   new QueuePublisher(sanitizedConfig.Q_URL, "verificationEmail")
@@ -38,8 +38,8 @@ router.post(
 );
 
 function makeRegistrationController(
-  action: keyof IRegistrationHandler,
-  handler: IRegistrationHandler
+  action: keyof IRegistrationService,
+  handler: IRegistrationService
 ) {
   return async function controller(req: Request, res: Response) {
     const httpRequest: httpRequest = adaptRequest(req);

@@ -46,9 +46,11 @@ class StudentRegistrationHandler implements IStudentRegistrationHandler {
   }
 
   async submitPersonalInfo(req: httpRequest) {
-    const { email, first_name, last_name } = req.body;
+    const { email, first_name, last_name, major } = req.body;
     let user = await this.userRepoFacad.UserRepo.getUserByEmail(email);
     if (!user) return makeHttpError(400, "you don't have an account");
+    if (user.registration_completed)
+      return makeHttpError(400, "Registration already completed");
     user = await this.userRepoFacad.UserRepo.completeAccount(
       email,
       first_name,
@@ -56,7 +58,7 @@ class StudentRegistrationHandler implements IStudentRegistrationHandler {
     );
     return makeHttpResponse(
       200,
-      {},
+      { user },
       { message: "account registration completed" }
     );
   }

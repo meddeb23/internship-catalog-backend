@@ -45,6 +45,10 @@
         "type": "jwt",
         "roles": ["student"]
       }
+    },
+    {
+      "path": "/major",
+      "method": "GET"
     }
   ]
 }

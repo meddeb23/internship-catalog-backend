@@ -1,4 +1,4 @@
-import { Student, User } from "../../core/entities";
+import { Major, Student, User } from "../../core/entities";
 import { IStudentRepository } from "../../core/repositeries";
 import { StudentModel, UserModel } from "../model";
 
@@ -19,7 +19,7 @@ export default class StudentRepository implements IStudentRepository {
       user.role,
       user.registration_completed,
       student.address,
-      student.major
+      student.major.name
     );
   }
 
@@ -45,21 +45,15 @@ export default class StudentRepository implements IStudentRepository {
     );
   }
 
-  formatUser(student: Student): any {
-    return student;
-  }
-
   async createStudent(
     major: String,
     address: String,
     user: User
   ): Promise<Student> {
-    const student = await this.student.create({
-      address,
-      major,
-      userId: user.id,
-    });
-    if (!student) return null;
-    return this.#getStudentEntity(user, student);
+    throw new Error("Method not implemented.");
+  }
+
+  async formatUser(std: Student) {
+    throw new Error("Method not implemented.");
   }
 }

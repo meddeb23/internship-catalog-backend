@@ -1,39 +1,36 @@
-import { DataTypes, Model } from "sequelize";
 import User from "./UserModel";
-import sequelize from "../../database";
+import {
+  BelongsTo,
+  Column,
+  DataType,
+  ForeignKey,
+  Model,
+  Table,
+} from "sequelize-typescript";
 
-class Admin extends Model {
+@Table({ tableName: "admin" })
+class Admin extends Model<Admin> {
+  @Column({ primaryKey: true, autoIncrement: true })
   public id!: number;
+
+  @ForeignKey(() => User)
+  @Column(DataType.INTEGER.UNSIGNED)
   public userId!: number;
-  public jobTitle!: string;
+
+  @BelongsTo(() => User)
+  public user: User;
+
+  @Column({ type: DataType.STRING(100) })
   public department!: string;
+
+  @Column({ type: DataType.STRING(100) })
+  public jobTitle!: string;
+
+  @Column
   public readonly createdAt!: Date;
+
+  @Column
   public readonly updatedAt!: Date;
 }
-
-Admin.init(
-  {
-    id: {
-      type: DataTypes.INTEGER.UNSIGNED,
-      autoIncrement: true,
-      primaryKey: true,
-    },
-    jobTitle: {
-      type: DataTypes.STRING(255),
-      allowNull: false,
-    },
-    department: {
-      type: DataTypes.STRING(255),
-      allowNull: false,
-    },
-  },
-  {
-    sequelize,
-    tableName: "admin",
-  }
-);
-
-Admin.belongsTo(User);
-User.hasOne(Admin);
 
 export default Admin;

@@ -1,3 +1,4 @@
+export { default as MajorModel } from "./Major.model";
 export { default as UserModel } from "./UserModel";
 export { default as AdminModel } from "./AdminModel";
 export { default as StudentModel } from "./StudentModel";

@@ -1,13 +1,13 @@
 import config from "./config";
 import path from "path";
 import fs from "fs";
+import axios from "axios";
 
-import express, { Request, Response } from "express";
+import express from "express";
 
 import Debug from "debug";
 import morgan from "morgan";
 
-import sequelize from "./database";
 import {
   adminRegistrationRoutes,
   authRoutes,
@@ -15,31 +15,18 @@ import {
   emailVerification,
   studentRegistrationRoutes,
   userRoutes,
+  MajorRoutes,
 } from "./app";
-import axios from "axios";
-
-// read Endpoint configuration file
-const EndpointConfig = JSON.parse(
-  fs.readFileSync(
-    path.join(__dirname, "config", "ServiceMetadata.json"),
-    "utf-8"
-  )
-);
+import connectToDB from "./infrastructure/database";
 
 const debug = Debug("app:startup");
 
 const app = express();
 
 app.use(express.json());
-app.use(morgan("tiny"));
+app.use(morgan("common"));
 
-(async function () {
-  await sequelize.sync({ force: false });
-})().then(() => debug("🎈 Database connection established "));
-
-app.get("/", (req: Request, res: Response) => {
-  res.status(200).json({ message: "hello world 👋" });
-});
+connectToDB().then(() => debug("Database connection established "));
 
 app.use("/", emailVerification);
 app.use("/student", studentRegistrationRoutes);
@@ -47,10 +34,18 @@ app.use("/professor", professorRegistrationRoutes);
 app.use("/admin", adminRegistrationRoutes);
 app.use("/auth", authRoutes);
 app.use("/user", userRoutes);
+app.use("/major", MajorRoutes);
 
 const PORT: Number = config.PORT;
 
 app.listen(PORT, function () {
+  // read Endpoint configuration file
+  const EndpointConfig = JSON.parse(
+    fs.readFileSync(
+      path.join(__dirname, "config", "ServiceMetadata.json"),
+      "utf-8"
+    )
+  );
   const register_url = process.env.SERVICE_DISCOVERY_URL;
   const serviceRegister = () =>
     axios
