@@ -30,6 +30,8 @@ app.use(morgan("common", {
 
 const registery = new Registery();
 
+app.get("/", (req, res) => res.send('<h1>hello world</h1>'))
+
 app.post("/register", (req, res) => {
   const { value, error } = ServiceRegisteryRequestSchema.validate(req.body);
   if (error) {
