@@ -51,6 +51,12 @@
       }
     },
     {
+      "description": "Get companies name according to a query",
+      "path": "/company/q/:query",
+      "method": "GET",
+      "params": ["id"]
+    },
+    {
       "description": "Add a review for a company",
       "path": "/review",
       "method": "POST",

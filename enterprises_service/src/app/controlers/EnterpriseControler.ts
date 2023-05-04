@@ -22,6 +22,7 @@ router.put(
 );
 router.get("/", makeEnterpriseController("getCompaniesPage", service));
 router.get("/:id", makeEnterpriseController("getCompanyById", service));
+router.get("/q/:query", makeEnterpriseController("autoComplete", service));
 
 function makeEnterpriseController(
   action: keyof IEnterpriseService,

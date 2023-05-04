@@ -1,14 +1,27 @@
 import { Enterprise, IEnterpriseRepository } from "../../core";
 import fs from "fs";
 import { EnterpriseModel } from "../model";
+import { Op } from "sequelize";
 import { RepoError } from "../../helper";
-import { threadId } from "worker_threads";
 
 export default class EnterpriseRepository implements IEnterpriseRepository {
   readonly enterprise: typeof EnterpriseModel;
 
   constructor(enterpriseModel: typeof EnterpriseModel) {
     this.enterprise = enterpriseModel;
+  }
+  async getCompaniesName(query: string, limit?: number): Promise<string[]> {
+    const matchingCompanies = await this.enterprise.findAll({
+      where: {
+        company_name: {
+          [Op.like]: `%${query.toLowerCase()}%`,
+        },
+      },
+    });
+    const matchingCompanyNames = matchingCompanies.map(
+      (company) => company.company_name
+    );
+    return matchingCompanyNames;
   }
 
   #handleError(err: any, action: string) {

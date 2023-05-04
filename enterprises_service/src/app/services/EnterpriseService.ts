@@ -1,3 +1,4 @@
+import { query } from "express";
 import { Enterprise, IEnterpriseRepository } from "../../core";
 import {
   httpRequest,
@@ -13,12 +14,27 @@ export interface IEnterpriseService {
   getCompanyById(req: httpRequest): Promise<any>;
   getCompaniesPage(req: httpRequest): Promise<any>;
   updateCompanyData(req: httpRequest): Promise<any>;
+  autoComplete(req: httpRequest): Promise<any>;
 }
 
 export default class EnterpriseService implements IEnterpriseService {
   enterpriseRepo: IEnterpriseRepository;
   constructor(enterpriseRepo: IEnterpriseRepository) {
     this.enterpriseRepo = enterpriseRepo;
+  }
+  async autoComplete(req: httpRequest): Promise<any> {
+    const { value: query, error } = EnterpriseValidator.stringSchema.validate(
+      req.pathParams.query,
+      { abortEarly: false }
+    );
+
+    if (error) {
+      const errorDetails = error.details.map((detail) => detail.message);
+      console.log(errorDetails);
+      return makeHttpError(400, "bad id");
+    }
+    const result = await this.enterpriseRepo.getCompaniesName(query);
+    return makeHttpResponse(200, { result });
   }
 
   async verifyCompany(req: httpRequest): Promise<any> {

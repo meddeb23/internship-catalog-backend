@@ -4,6 +4,8 @@ const numIdSchema = Joi.number().greater(0).required();
 const positiveInteger = Joi.number().greater(0);
 
 export class EnterpriseServiceValidator {
+  static stringSchema = Joi.string().min(2).required();
+
   static idSchema = Joi.object({
     id: Joi.number().greater(0).required(),
   });
