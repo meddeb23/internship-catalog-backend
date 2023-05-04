@@ -1,7 +1,7 @@
 import Enterprise from "../entities/Enterprise";
 
 export default interface IEnterpriseRepository {
-  getCompaniesName(query: string, limit?: number): Promise<string[]>;
+  getCompaniesName(query: string, limit?: number): Promise<Enterprise[]>;
   getEnterpriseById: (enp_id: number) => Promise<Enterprise>;
   save: (enp: Enterprise) => Promise<void>;
   getEnterprisePage: (

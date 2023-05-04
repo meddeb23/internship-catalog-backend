@@ -10,7 +10,7 @@ export default class EnterpriseRepository implements IEnterpriseRepository {
   constructor(enterpriseModel: typeof EnterpriseModel) {
     this.enterprise = enterpriseModel;
   }
-  async getCompaniesName(query: string, limit?: number): Promise<string[]> {
+  async getCompaniesName(query: string, limit?: number): Promise<Enterprise[]> {
     const matchingCompanies = await this.enterprise.findAll({
       where: {
         company_name: {
@@ -18,10 +18,10 @@ export default class EnterpriseRepository implements IEnterpriseRepository {
         },
       },
     });
-    const matchingCompanyNames = matchingCompanies.map(
-      (company) => company.company_name
-    );
-    return matchingCompanyNames;
+    // const matchingCompanyNames = matchingCompanies.map(
+    //   (company) => company.company_name
+    // );
+    return matchingCompanies;
   }
 
   #handleError(err: any, action: string) {
