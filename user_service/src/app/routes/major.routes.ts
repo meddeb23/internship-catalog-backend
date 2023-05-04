@@ -8,7 +8,7 @@ import {
 import adaptRequest, { httpRequest } from "../../helper/adapt-request";
 import { MajorRepository } from "../../infrastructure";
 import { MajorModel } from "../../infrastructure/model";
-import MajorService, { IMajorService } from "../services/MajorServiec";
+import MajorService, { IMajorService } from "../services/MajorService";
 
 const router = Router();
 
@@ -17,9 +17,9 @@ const majorsService = new MajorService(majorRepository);
 
 router.post("/", makeMajorController("createMajor", majorsService));
 router.get("/", makeMajorController("getAllMajors", majorsService));
-router.get("/:id", makeMajorController("getMajorById", majorsService));
-router.put("/:id", makeMajorController("updateMajor", majorsService));
-router.delete("/:id", makeMajorController("deleteMajor", majorsService));
+router.get("/:majorId", makeMajorController("getMajorById", majorsService));
+router.put("/:majorId", makeMajorController("updateMajor", majorsService));
+router.delete("/:majorId", makeMajorController("deleteMajor", majorsService));
 
 function makeMajorController(
   action: keyof IMajorService,

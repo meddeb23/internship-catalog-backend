@@ -13,7 +13,7 @@ import {
   authRoutes,
   professorRegistrationRoutes,
   emailVerification,
-  studentRegistrationRoutes,
+  studentRoutes,
   userRoutes,
   MajorRoutes,
 } from "./app";
@@ -29,7 +29,7 @@ app.use(morgan("common"));
 connectToDB().then(() => debug("Database connection established "));
 
 app.use("/", emailVerification);
-app.use("/student", studentRegistrationRoutes);
+app.use("/student", studentRoutes);
 app.use("/professor", professorRegistrationRoutes);
 app.use("/admin", adminRegistrationRoutes);
 app.use("/auth", authRoutes);

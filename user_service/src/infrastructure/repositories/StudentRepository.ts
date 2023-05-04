@@ -1,6 +1,6 @@
 import { Major, Student, User } from "../../core/entities";
 import { IStudentRepository } from "../../core/repositeries";
-import { StudentModel, UserModel } from "../model";
+import { MajorModel, StudentModel, UserModel } from "../model";
 
 export default class StudentRepository implements IStudentRepository {
   readonly student: typeof StudentModel;
@@ -8,52 +8,53 @@ export default class StudentRepository implements IStudentRepository {
   constructor(studentModel: typeof StudentModel) {
     this.student = studentModel;
   }
+  async getallStudent(): Promise<Student[]> {
+    const students = await this.student.findAll({
+      include: [{ model: UserModel }, { model: MajorModel }],
+    });
+    if (!students) return null;
+    return students.map((s) => this.getStudentEntity(s));
+  }
 
-  #getStudentEntity(user: User, student: StudentModel): Student {
+  private getStudentEntity(student: StudentModel): Student {
     return new Student(
-      user.id,
-      user.first_name,
-      user.last_name,
-      user.email,
-      user.password,
-      user.role,
-      user.registration_completed,
+      student.user.id,
+      student.user.first_name,
+      student.user.last_name,
+      student.user.email,
+      student.user.password,
+      student.user.role,
+      student.user.registration_completed,
       student.address,
       student.major.name
     );
   }
 
-  async getStudent(studentId: number): Promise<Student> {
+  async getStudentById(studentId: number): Promise<Student> {
     const student: any = await this.student.findByPk(studentId, {
-      include: [
-        {
-          model: UserModel,
-          // attributes: ["first_name","last_name"]
-        },
-      ],
+      include: [{ model: UserModel }, { model: MajorModel }],
     });
-    return new Student(
-      student.User.id,
-      student.User.first_name,
-      student.User.last_name,
-      student.User.email,
-      student.User.password,
-      student.User.role,
-      student.User.registration_completed,
-      student.address,
-      student.major
-    );
+    return student ? this.getStudentEntity(student) : null;
+  }
+
+  async getStudentByUserId(userId: number): Promise<Student> {
+    const student: any = await this.student.findOne({
+      where: { userId },
+      include: [{ model: UserModel }, { model: MajorModel }],
+    });
+    return student ? this.getStudentEntity(student) : null;
   }
 
   async createStudent(
-    major: String,
-    address: String,
-    user: User
+    user: User,
+    major: Major,
+    address: string = null
   ): Promise<Student> {
-    throw new Error("Method not implemented.");
-  }
-
-  async formatUser(std: Student) {
-    throw new Error("Method not implemented.");
+    const student = await this.student.create({
+      userId: user.id,
+      majorId: major.id,
+      address,
+    });
+    return this.getStudentById(student.id);
   }
 }

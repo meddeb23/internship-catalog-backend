@@ -1,6 +1,6 @@
 {
   "name": "user-service",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "endpoints": [
     {
       "path": "/verify_email",
@@ -39,11 +39,35 @@
       }
     },
     {
-      "path": "/user/me",
+      "path": "/student",
       "method": "GET",
       "auth": {
         "type": "jwt",
         "roles": ["student"]
+      }
+    },
+    {
+      "path": "/student/:userId",
+      "method": "GET",
+      "auth": {
+        "type": "jwt",
+        "roles": ["admin"]
+      }
+    },
+    {
+      "path": "/student/all",
+      "method": "GET",
+      "auth": {
+        "type": "jwt",
+        "roles": ["admin"]
+      }
+    },
+    {
+      "path": "/major/:majorId",
+      "method": "GET",
+      "auth": {
+        "type": "jwt",
+        "roles": ["admin"]
       }
     },
     {

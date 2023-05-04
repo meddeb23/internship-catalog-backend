@@ -13,10 +13,6 @@ const studentRepository: Readonly<IStudentRepository> = new StudentRepository(
 
 const userService: IUserService = new UserService(studentRepository);
 
-router.get(
-  "/student/:studentId",
-  makeRegistrationController("getStudent", userService)
-);
 router.get("/me", makeRegistrationController("getSelfInfo", userService));
 
 function makeRegistrationController(

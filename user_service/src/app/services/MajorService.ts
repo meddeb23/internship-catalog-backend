@@ -15,20 +15,23 @@ class MajorService implements IMajorService {
     this.majorRepository = majorRepository;
   }
   createMajor(req: httpRequest) {
-    throw new Error("Method not implemented.");
+    return makeHttpError(404, "Method not implemented.");
   }
-  getMajorById(req: httpRequest) {
-    throw new Error("Method not implemented.");
+  async getMajorById(req: httpRequest) {
+    const { majorId } = req.pathParams;
+    const major = await this.majorRepository.getMajorById(majorId);
+    if (!major) return makeHttpError(404, "Major not found");
+    return makeHttpResponse(200, { major });
   }
   async getAllMajors(req: httpRequest) {
     const majors = await this.majorRepository.getAllMajors();
     return makeHttpResponse(200, { majors });
   }
   updateMajor(req: httpRequest) {
-    throw new Error("Method not implemented.");
+    return makeHttpError(404, "Method not implemented.");
   }
   deleteMajor(req: httpRequest) {
-    throw new Error("Method not implemented.");
+    return makeHttpError(404, "Method not implemented.");
   }
 }
 

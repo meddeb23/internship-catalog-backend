@@ -14,7 +14,9 @@ export default class MajorRepository implements IMajorRepository {
     return majors.map((m) => this.getMajorEntity(m));
   }
   async getMajorById(id: number): Promise<Major> {
-    throw new Error("Method not implemented.");
+    const major = await this.Major.findOne({ where: { id } });
+    console.log(major);
+    return major ? this.getMajorEntity(major) : null;
   }
   async createMajor(major: Major): Promise<Major> {
     throw new Error("Method not implemented.");
