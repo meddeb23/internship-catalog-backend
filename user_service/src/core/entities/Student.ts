@@ -34,6 +34,7 @@ export default class Student extends User {
       last_name: this.last_name,
       email: this.email,
       major: this.major,
+      registration_completed: this.registration_completed,
     };
   }
 }
