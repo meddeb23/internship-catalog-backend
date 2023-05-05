@@ -2,7 +2,7 @@ import path from "path"
 
 import dotenv from "dotenv";
 
-dotenv.config({ path: path.resolve("../.env") });
+dotenv.config();
 
 import express, { json } from "express";
 import Registery from "../lib/registery.js";
@@ -11,7 +11,7 @@ import morgan from "morgan";
 import fileUpload from "express-fileupload";
 import helmet from "helmet";
 
-import { routingRequest, requestFile } from "../lib/RequestHandler.js";
+import RequestHandler from "../lib/RequestHandler.js";
 import ServiceRegisteryRequestSchema from "../helper/ServiceRegisteryRequestValidation.js";
 import logger from "../lib/Logger.js"
 
@@ -24,11 +24,12 @@ app.use((req, res, next) => {
   next();
 });
 app.use(morgan("common", {
-  // stream: { write: (message) => logger.http(message.trim()) },
+  stream: { write: (message) => logger.http(message) },
   skip: (req, res) => req.path === "/register"
 }));
 
 const registery = new Registery();
+const requestHandler = new RequestHandler();
 
 app.get("/", (req, res) => res.send('<h1>hello world</h1>'))
 
@@ -57,7 +58,7 @@ app.get("/public/*", async (req, res) => {
   if (!service)
     return res.status(404).json({ message: "service not found 😢" });
   try {
-    const { data, status } = await requestFile(req, res, path, service);
+    const { data, status } = await requestHandler.requestFile(req, res, path, service);
     if (status == 200) data.pipe(res);
     else res.status(status).end();
   } catch (err) {
@@ -76,10 +77,14 @@ app.all("/:service_name/:service_version/*", async (req, res) => {
     return res.status(404).json({ message: "service not found 😢" });
   }
   try {
-    const { data, status } = await routingRequest(req, res, path, service);
+    const { data, status } = await requestHandler.routingRequest(req, res, path, service);
     return res.status(status).json(data);
   } catch (err) {
+    const error = new Error();
     console.log('stack: ', err.stack);
+    if (process.env.NODE_ENV !== "development")
+      return res.status(500).send("Something Went wrong 🍥");
+
     if (err.response) {
       return res.status(err.response.status).send(err.response.data);
     }
@@ -89,4 +94,4 @@ app.all("/:service_name/:service_version/*", async (req, res) => {
 
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => logger.info(`getway is runnning on port ${PORT}`));
+app.listen(PORT, () => logger.info(`getway is runnning on port ${PORT} in ${process.env.NODE_ENV} mode`));
