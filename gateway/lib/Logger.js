@@ -26,7 +26,7 @@ winston.addColors(colors)
 
 const customFormat = format.combine(
     format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss:ms' }),
-    format.colorize({ all: true }),
+    // format.colorize({ all: true }),
     format.printf(
         (info) => `${info.timestamp} [${info.level.toUpperCase()}]: ${info.message} ${info.metadata && Object.keys(info.metadata).length ? "\n" + JSON.stringify(info.metadata) : ""}`,
     ),
@@ -40,21 +40,6 @@ const transports = [
 ]
 
 const logger = winston.createLogger({
-    // format: combine(
-    //     metadata(),
-    //     timestamp(),
-    //     printf(info => {
-    //         return `[${info.timestamp}] [${info.level.toUpperCase()}] ${info.message} ${info.metadata && Object.keys(info.metadata).length ? "\n" + JSON.stringify(info.metadata) : ""}`
-    //     })
-    // ),
-    // formatter: logFormat,
-
-    // function (options) {
-    //     return options.timestamp() + ' ' +
-    //         config.colorize(options.level, options.level.toUpperCase()) + ' ' +
-    //         (options.message ? options.message : '') +
-    //         (options.meta && Object.keys(options.meta).length ? '\n\t' + JSON.stringify(options.meta) : '');
-    // },
     levels,
     format: customFormat,
     transports,
