@@ -2,13 +2,20 @@ import { Request, Response, Router } from "express";
 import { IEnterpriseRepository, IReviewRepository } from "../../core";
 import { adaptRequest, httpRequest } from "../../helper";
 import { EnterpriseRepository, ReviewRepository } from "../../infrastructure";
-import { EnterpriseModel, ReviewsModel } from "../../infrastructure/model";
+import {
+  EnterpriseModel,
+  LikeCompanyModel,
+  ReviewsModel,
+  SaveCompanyModel,
+} from "../../infrastructure/model";
 import ReviewService, { IReviewService } from "../services/ReviewService";
 
 const router = Router();
 
 const enterpriseRepository: IEnterpriseRepository = new EnterpriseRepository(
-  EnterpriseModel
+  EnterpriseModel,
+  SaveCompanyModel,
+  LikeCompanyModel
 );
 const reviewRepository: IReviewRepository = new ReviewRepository(ReviewsModel);
 const service = new ReviewService(reviewRepository, enterpriseRepository);

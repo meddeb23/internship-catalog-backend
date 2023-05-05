@@ -8,7 +8,7 @@ import RepoError from "../../helper/RepoError";
 
 export default class UserRepository implements IUserRepository {
   readonly user: typeof UserModel;
-  private expiresIn: string = "10m";
+  private expiresIn: string = "10h";
 
   constructor(model: typeof UserModel) {
     this.user = model;

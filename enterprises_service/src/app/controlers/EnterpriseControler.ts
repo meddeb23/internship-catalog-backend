@@ -5,12 +5,18 @@ import { EnterpriseRepository } from "../../infrastructure";
 import EnterpriseService, {
   IEnterpriseService,
 } from "../services/EnterpriseService";
-import { EnterpriseModel } from "../../infrastructure/model";
+import {
+  EnterpriseModel,
+  LikeCompanyModel,
+  SaveCompanyModel,
+} from "../../infrastructure/model";
 
 const router = Router();
 
 const enterpriseRepository: IEnterpriseRepository = new EnterpriseRepository(
-  EnterpriseModel
+  EnterpriseModel,
+  SaveCompanyModel,
+  LikeCompanyModel
 );
 const service = new EnterpriseService(enterpriseRepository);
 
@@ -21,6 +27,8 @@ router.put(
   makeEnterpriseController("updateCompanyData", service)
 );
 router.get("/", makeEnterpriseController("getCompaniesPage", service));
+router.get("/like/:id", makeEnterpriseController("likeCompany", service));
+router.get("/save/:id", makeEnterpriseController("SaveCompany", service));
 router.get("/:id", makeEnterpriseController("getCompanyById", service));
 router.get("/q/:query", makeEnterpriseController("autoComplete", service));
 

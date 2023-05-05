@@ -7,6 +7,7 @@ import {
   RepoError,
 } from "../../helper";
 import { EnterpriseServiceValidator as EnterpriseValidator } from "./validation";
+import { Validate } from "sequelize-typescript";
 
 export interface IEnterpriseService {
   addCompany: (req: httpRequest) => Promise<any>;
@@ -15,6 +16,8 @@ export interface IEnterpriseService {
   getCompaniesPage(req: httpRequest): Promise<any>;
   updateCompanyData(req: httpRequest): Promise<any>;
   autoComplete(req: httpRequest): Promise<any>;
+  likeCompany(req: httpRequest): Promise<any>;
+  SaveCompany(req: httpRequest): Promise<any>;
 }
 
 export default class EnterpriseService implements IEnterpriseService {
@@ -22,6 +25,43 @@ export default class EnterpriseService implements IEnterpriseService {
   constructor(enterpriseRepo: IEnterpriseRepository) {
     this.enterpriseRepo = enterpriseRepo;
   }
+
+  async likeCompany(req: httpRequest): Promise<any> {
+    const { id } = req.body.user;
+
+    const {
+      value: { id: companyId },
+      error,
+    } = EnterpriseValidator.idSchema.validate(req.pathParams);
+    if (error) return makeHttpError(400, error.message);
+
+    const company = await this.enterpriseRepo.getEnterpriseById(companyId);
+    if (!company) return makeHttpError(404, "company not found");
+
+    const like = this.enterpriseRepo.likeCompany(id, company.id);
+    if (!like) return makeHttpError(500, "could not like company");
+
+    return makeHttpResponse(201, {});
+  }
+
+  async SaveCompany(req: httpRequest): Promise<any> {
+    const { id } = req.body.user;
+
+    const {
+      value: { id: companyId },
+      error,
+    } = EnterpriseValidator.idSchema.validate(req.pathParams);
+    if (error) return makeHttpError(400, error.message);
+
+    const company = await this.enterpriseRepo.getEnterpriseById(companyId);
+    if (!company) return makeHttpError(404, "company not found");
+
+    const save = this.enterpriseRepo.saveCompany(id, company.id);
+    if (!save) return makeHttpError(500, "could not save company");
+
+    return makeHttpResponse(201, {});
+  }
+
   async autoComplete(req: httpRequest): Promise<any> {
     const { value: query, error } = EnterpriseValidator.stringSchema.validate(
       req.pathParams.query,

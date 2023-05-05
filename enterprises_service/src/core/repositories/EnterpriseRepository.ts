@@ -12,4 +12,6 @@ export default interface IEnterpriseRepository {
   readFromFiles: () => Promise<Array<any>>;
   verfiyCompany(enp_id: number): Promise<number>;
   updateEnterprise(id: number, value: any): Promise<Enterprise>;
+  likeCompany(userId: number, companyId: number): Promise<boolean>;
+  saveCompany(userId: number, companyId: number): Promise<boolean>;
 }

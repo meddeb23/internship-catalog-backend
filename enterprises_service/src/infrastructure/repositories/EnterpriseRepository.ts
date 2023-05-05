@@ -1,14 +1,32 @@
 import { Enterprise, IEnterpriseRepository } from "../../core";
 import fs from "fs";
-import { EnterpriseModel } from "../model";
+import { EnterpriseModel, LikeCompanyModel, SaveCompanyModel } from "../model";
 import { Op } from "sequelize";
 import { RepoError } from "../../helper";
 
 export default class EnterpriseRepository implements IEnterpriseRepository {
   readonly enterprise: typeof EnterpriseModel;
+  readonly like: typeof LikeCompanyModel;
+  readonly savec: typeof SaveCompanyModel;
 
-  constructor(enterpriseModel: typeof EnterpriseModel) {
+  constructor(
+    enterpriseModel: typeof EnterpriseModel,
+    saveCompanyModel: typeof SaveCompanyModel,
+    likeCompanyModel: typeof LikeCompanyModel
+  ) {
     this.enterprise = enterpriseModel;
+    this.like = likeCompanyModel;
+    this.savec = saveCompanyModel;
+  }
+  async likeCompany(userId: number, companyId: number): Promise<boolean> {
+    const like = await this.like.create({ userId, companyId });
+    if (!like) return null;
+    return true;
+  }
+  async saveCompany(userId: number, companyId: number): Promise<boolean> {
+    const save = await this.savec.create({ userId, companyId });
+    if (!save) return null;
+    return true;
   }
   async getCompaniesName(query: string, limit?: number): Promise<Enterprise[]> {
     const matchingCompanies = await this.enterprise.findAll({

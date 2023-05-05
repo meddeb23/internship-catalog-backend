@@ -54,7 +54,31 @@
       "description": "Get companies name according to a query",
       "path": "/company/q/:query",
       "method": "GET",
-      "params": ["id"]
+      "params": ["id"],
+      "auth": {
+        "type": "jwt",
+        "roles": ["admin", "student"]
+      }
+    },
+    {
+      "description": "toggle like companies",
+      "path": "/company/like/:companyId",
+      "method": "GET",
+      "params": ["companyId"],
+      "auth": {
+        "type": "jwt",
+        "roles": ["admin", "student"]
+      }
+    },
+    {
+      "description": "toggle save companies",
+      "path": "/company/save/:companyId",
+      "method": "GET",
+      "params": ["companyId"],
+      "auth": {
+        "type": "jwt",
+        "roles": ["admin", "student"]
+      }
     },
     {
       "description": "Add a review for a company",
