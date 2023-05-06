@@ -96,6 +96,7 @@ export default class RequestHandler {
       }
       return { user: isAuth.user }
     }
+    return {}
   }
 
   async routingRequest(req, res, path, service) {
@@ -109,30 +110,30 @@ export default class RequestHandler {
         status: 404,
       };
     if (endpoint.auth) {
-      const { user, data, status } = this.#authCheck(endpoint, req.headers.authorization)
+      const { user, data, status } = await this.#authCheck(endpoint, req.headers.authorization)
       console.log(data, status, user)
       if (!user) return { data, status }
       req.body.user = user;
     }
+    console.log(`http://${service.ip}:${service.port}/${path}`)
+    const { data, headers, status } = await this.callService(
+      req.method,
+      req.body,
+      `http://${service.ip}:${service.port}/${path}`,
+      req.headers,
+      req.files
+    );
+    Object.keys(headers).forEach((h) => {
+      res.setHeader(h, headers[h]);
+    });
+    return { data, status };
+    // try {
+    //   // throw Error("Booya 🐛")
 
-    try {
-      // throw Error("Booya 🐛")
-      console.log(`http://${service.ip}:${service.port}/${path}`)
-      const { data, headers, status } = await this.callService(
-        req.method,
-        req.body,
-        `http://${service.ip}:${service.port}/${path}`,
-        req.headers,
-        req.files
-      );
-      Object.keys(headers).forEach((h) => {
-        res.setHeader(h, headers[h]);
-      });
-      return { data, status };
-    } catch (err) {
-      console.log(err)
-      return { status: 503 };
-    }
+    // } catch (err) {
+    //   console.log(err.stack)
+    //   return { status: 503 };
+    // }
 
   };
 }
