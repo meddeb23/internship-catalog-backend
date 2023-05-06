@@ -1,10 +1,25 @@
-import { InternshipprocessModel } from "../model";
+import { InternshipProcessModel } from "../model";
 import { RepoError } from "../../helper";
 
 import { IInternshipProcessRepo } from "../../core/repositories";
 import { InternshipProcess } from "../../core/entities";
 
 export default class InternshipProcessRepo implements IInternshipProcessRepo {
+  async getByStudent(studentId: number): Promise<InternshipProcess> {
+    try {
+      const e = await InternshipProcessModel.findOne({
+        where: {
+          studentId,
+        },
+      });
+      if (!e) return null;
+      return this.getEntityFromModel(e);
+      return null;
+    } catch (err) {
+      console.log(err);
+      this.#handleError(err, "Error getting process by Pk");
+    }
+  }
   #handleError(err: any, action: string) {
     const error = new RepoError("Error in InternshipProcess Repository");
     err.errors.forEach((e: any) => {
@@ -17,26 +32,21 @@ export default class InternshipProcessRepo implements IInternshipProcessRepo {
     throw error;
   }
 
-  // #GetEntityFromModel(i: InternshipprocessModel): InternshipProcess {
-  //   i.ge
-  //   return new InternshipProcess(
-  //     i.studentId,
-  //     i.companyId,
-  //     i.department,
-  //     i.companySupervisorName,
-  //     i.companySupervisorAddress,
-  //     i.companySupervisorPhone,
-  //     i.choices,
-  //     i.universitySupervisor,
-  //     i.codeSujet
-  //   );
-  // }
+  private getEntityFromModel(i: InternshipProcessModel): InternshipProcess {
+    return new InternshipProcess(
+      i.id,
+      i.department,
+      i.companySupervisorName,
+      i.companySupervisorAddress,
+      i.companySupervisorPhone
+    );
+  }
 
-  async getById(codeSujet: string): Promise<InternshipProcess> {
+  async getById(id: number): Promise<InternshipProcess> {
     try {
-      const e = await InternshipprocessModel.findByPk(codeSujet);
+      const e = await InternshipProcessModel.findByPk(id);
       if (!e) return null;
-      // return this.#GetEntityFromModel(e);
+      // return this.#getEntityFromModel(e);
       return null;
     } catch (err) {
       console.log(err);
@@ -45,29 +55,40 @@ export default class InternshipProcessRepo implements IInternshipProcessRepo {
   }
 
   async getByPage(page: number, limit: number): Promise<InternshipProcess[]> {
-    const enps = await InternshipprocessModel.findAll({
+    const enps = await InternshipProcessModel.findAll({
       offset: (page - 1) * limit,
       limit: limit + 1,
     });
 
-    // const res = enps.map((e) => this.#GetEntityFromModel(e));
+    // const res = enps.map((e) => this.#getEntityFromModel(e));
     // return res;
     return null;
   }
 
-  async save(enp: InternshipProcess): Promise<void> {
-    try {
-      await InternshipprocessModel.create({ ...enp });
-    } catch (err) {
-      console.error("Error:", err);
-    }
+  async create(
+    studentId: number,
+    companyId: number,
+    department: string,
+    companySupervisorName: string,
+    companySupervisorAddress: string,
+    companySupervisorPhone: string
+  ): Promise<InternshipProcess> {
+    const application = await InternshipProcessModel.create({
+      studentId,
+      companyId,
+      department,
+      companySupervisorName,
+      companySupervisorAddress,
+      companySupervisorPhone,
+    });
+    return this.getEntityFromModel(application);
   }
 
-  async update(codeSujet: string, value: any): Promise<InternshipProcess> {
-    const [row] = await InternshipprocessModel.update(value, {
-      where: { codeSujet },
+  async update(id: number, value: any): Promise<InternshipProcess> {
+    const [row] = await InternshipProcessModel.update(value, {
+      where: { id },
     });
     if (row !== 1) return null;
-    return this.getById(codeSujet);
+    return this.getById(id);
   }
 }

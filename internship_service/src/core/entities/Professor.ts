@@ -4,7 +4,7 @@ import User from "./User";
 export default class Professor extends User {
   officeLocation: string | null;
   department: string;
-  preferedDomains: Array<TechnicalDomain> | null;
+  preferedDomains?: Array<TechnicalDomain> | null;
   SFE_limit: number;
   PFE_limit: number;
   constructor(
@@ -17,7 +17,7 @@ export default class Professor extends User {
     registration_completed: boolean,
     officeLocation: string | null,
     department: string,
-    preferedDomains: Array<TechnicalDomain> | null,
+    preferedDomains?: Array<TechnicalDomain> | null,
     SFE_limit: number = 8,
     PFE_limit: number = 8
   ) {

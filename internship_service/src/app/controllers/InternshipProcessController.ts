@@ -38,15 +38,19 @@ const service = new StudentProcessApplicationService(
   supervisorRepo
 );
 
-router.post("/add", makeInternshipController("submitApplication", service));
-router.put(
-  "/update/:codeSujet",
-  makeInternshipController("updateApplicationData", service)
+router.post("/subject", makeInternshipController("submitApplication", service));
+router.post(
+  "/supervisors",
+  makeInternshipController("submitApplicationSupervisors", service)
 );
-router.get(
-  "/:codeSujet",
-  makeInternshipController("getApplicationById", service)
-);
+// router.put(
+//   "/update/:codeSujet",
+//   makeInternshipController("updateApplicationData", service)
+// );
+// router.get(
+//   "/:codeSujet",
+//   makeInternshipController("getApplicationById", service)
+// );
 
 function makeInternshipController(
   action: keyof IProcessApplicationService,

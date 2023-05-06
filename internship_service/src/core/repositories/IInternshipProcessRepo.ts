@@ -1,7 +1,15 @@
 import { InternshipProcess } from "../entities";
 export default interface IInternshipProcessRepo {
-  getById: (codeSujet: String) => Promise<InternshipProcess>;
-  save: (intProc: InternshipProcess) => Promise<void>;
+  getById: (id: number) => Promise<InternshipProcess>;
+  getByStudent(studentId: number): Promise<InternshipProcess>;
+  create: (
+    studentId: number,
+    companyId: number,
+    department: string,
+    companySupervisorName: string,
+    companySupervisorAddress: string,
+    companySupervisorPhone: string
+  ) => Promise<InternshipProcess>;
   getByPage: (page: number, limit: number) => Promise<Array<InternshipProcess>>;
-  update(codeSujet: String, value: any): Promise<InternshipProcess>;
+  update(id: number, value: any): Promise<InternshipProcess>;
 }

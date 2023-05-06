@@ -17,7 +17,8 @@ export default class TechnicalDomainRepository implements ITechnicalDomainRepo {
   }
 
   #GetEntityFromModel(c: TechnicalDomainModel): TechnicalDomain {
-    return new TechnicalDomain();
+    // return new TechnicalDomain();
+    throw new Error("Not Implemented");
   }
 
   async getById(domainId: number): Promise<TechnicalDomain> {

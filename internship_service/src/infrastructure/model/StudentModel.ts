@@ -1,39 +1,35 @@
-import { DataTypes, Model } from "sequelize";
+import {
+  Table,
+  Column,
+  Model,
+  ForeignKey,
+  BelongsTo,
+  DataType,
+} from "sequelize-typescript";
 import User from "./UserModel";
-import sequelize from "../database";
+import Major from "./Major.model";
 
-class Student extends Model {
-  public id!: number;
-  public userId!: number;
-  public address!: string;
-  public major!: string;
-  public readonly createdAt!: Date;
-  public readonly updatedAt!: Date;
+@Table({ tableName: "student" })
+class Student extends Model<Student> {
+  @Column({ primaryKey: true, autoIncrement: true })
+  public id: number;
+
+  @Column({ allowNull: true })
+  public address: string;
+
+  @ForeignKey(() => User)
+  @Column(DataType.INTEGER.UNSIGNED)
+  public userId: number;
+
+  @BelongsTo(() => User)
+  user: User;
+
+  @ForeignKey(() => Major)
+  @Column({ type: DataType.INTEGER.UNSIGNED })
+  public majorId: number;
+
+  @BelongsTo(() => Major)
+  public major: Major;
 }
-
-Student.init(
-  {
-    id: {
-      type: DataTypes.INTEGER.UNSIGNED,
-      autoIncrement: true,
-      primaryKey: true,
-    },
-    address: {
-      type: DataTypes.STRING(255),
-      allowNull: false,
-    },
-    major: {
-      type: DataTypes.STRING(255),
-      allowNull: false,
-    },
-  },
-  {
-    sequelize,
-    tableName: "student",
-  }
-);
-
-Student.belongsTo(User);
-User.hasOne(Student);
 
 export default Student;

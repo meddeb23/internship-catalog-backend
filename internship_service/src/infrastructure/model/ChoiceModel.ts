@@ -1,30 +1,28 @@
-import { Model, DataTypes } from "sequelize";
-import sequelize from "../database";
-import { InternshipprocessModel, ProfessorModel } from ".";
+import {
+  BelongsTo,
+  Column,
+  ForeignKey,
+  Model,
+  PrimaryKey,
+  Table,
+} from "sequelize-typescript";
+import InternshipProcess from "./InternshipProcess.model";
+import Professor from "./professorModel";
 
-class Supervisor_choice extends Model {
-  declare id: number;
-  declare internshipProcess: string;
-  declare supervisor: number;
+@Table
+class SupervisorChoice extends Model<SupervisorChoice> {
+  @PrimaryKey
+  @ForeignKey(() => InternshipProcess)
+  @Column
+  public internshipProcess: number;
+
+  @PrimaryKey
+  @ForeignKey(() => Professor)
+  @Column
+  public supervisorId: number;
+
+  @BelongsTo(() => Professor)
+  public professor: Professor;
 }
-Supervisor_choice.init(
-  {
-    supervisor: {
-      type: DataTypes.INTEGER.UNSIGNED,
-      references: {
-        model: ProfessorModel,
-        key: "id",
-      },
-    },
-    intershipProcess: {
-      type: DataTypes.STRING,
-      references: {
-        model: InternshipprocessModel,
-        key: "codeSujet",
-      },
-    },
-  },
-  { sequelize, tableName: "supervisor_choice" }
-);
 
-export default Supervisor_choice;
+export default SupervisorChoice;

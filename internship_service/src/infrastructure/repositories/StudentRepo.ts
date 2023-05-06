@@ -1,10 +1,10 @@
-import { StudentModel } from "../model";
+import { MajorModel, StudentModel, UserModel } from "../model";
 import { RepoError } from "../../helper";
 import { IStudentRepo } from "../../core/repositories";
 import { Student } from "../../core/entities";
 
 export default class StudentRepository implements IStudentRepo {
-  #handleError(err: any, action: string) {
+  private handleError(err: any, action: string) {
     const error = new RepoError("Error in supervisor Repository");
     err.errors.forEach((e: any) => {
       error.response.push({
@@ -16,19 +16,32 @@ export default class StudentRepository implements IStudentRepo {
     throw error;
   }
 
-  // #GetEntityFromModel(s: StudentModel): Student {
-  //   return new Student();
-  // }
+  private getStudentEntity(student: StudentModel): Student {
+    return new Student(
+      student.user.id,
+      student.user.first_name,
+      student.user.last_name,
+      student.user.email,
+      student.user.password,
+      student.user.role,
+      student.user.registration_completed,
+      student.address,
+      student.major.name
+    );
+  }
 
   async getById(id: number): Promise<Student> {
     try {
-      const e = await StudentModel.findByPk(id);
+      const e = await StudentModel.findOne({
+        where: { userId: id },
+        include: [UserModel, MajorModel],
+      });
       if (!e) return null;
-      // return this.#GetEntityFromModel(e);
-      return null;
+      console.log(e);
+      return this.getStudentEntity(e);
     } catch (err) {
       console.log(err);
-      this.#handleError(err, "Error getting choice by Pk");
+      this.handleError(err, "Error getting choice by Pk");
     }
   }
 }

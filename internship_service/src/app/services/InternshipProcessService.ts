@@ -4,6 +4,7 @@ import {
   IInternshipProcessRepo,
   IStudentRepo,
   ISupervisorChoiceRepo,
+  ISupervisorRepo,
   ITechnicalDomainRepo,
 } from "../../core/repositories";
 import {
@@ -12,12 +13,13 @@ import {
   makeHttpResponse,
   RepoError,
 } from "../../helper";
-import IntershipProcessServiceValidator from "./validation";
+import { InternshipProcessServiceValidator as ApplicationValidation } from "./validation";
 
 export interface IProcessApplicationService {
   submitApplication: (req: httpRequest) => Promise<any>;
   getApplicationById(req: httpRequest): Promise<any>;
   updateApplicationData(req: httpRequest): Promise<any>;
+  submitApplicationSupervisors(req: httpRequest): Promise<any>;
 }
 
 export default class StudentProcessApplicationService
@@ -28,14 +30,14 @@ export default class StudentProcessApplicationService
   studentRepo: IStudentRepo;
   choiceRepo: ISupervisorChoiceRepo;
   domainRepo: ITechnicalDomainRepo;
-  supervisorRepo: ISupervisorChoiceRepo;
+  supervisorRepo: ISupervisorRepo;
   constructor(
     internProcessRepo: IInternshipProcessRepo,
     companyRepo: ICompanyRepo,
     studentRepo: IStudentRepo,
     choiceRepo: ISupervisorChoiceRepo,
     domainRepo: ITechnicalDomainRepo,
-    supervisorRepo: ISupervisorChoiceRepo
+    supervisorRepo: ISupervisorRepo
   ) {
     this.internProcessRepo = internProcessRepo;
     this.companyRepo = companyRepo;
@@ -44,12 +46,34 @@ export default class StudentProcessApplicationService
     this.domainRepo = domainRepo;
     this.supervisorRepo = supervisorRepo;
   }
+  async submitApplicationSupervisors(req: httpRequest): Promise<any> {
+    const { value: choices, error } =
+      ApplicationValidation.choicesSchema.validate(req.body.choices);
+    if (error) return makeHttpError(400, error.message);
+
+    const application = await this.internProcessRepo.getByStudent(
+      req.body.user.id
+    );
+    if (!application) return makeHttpError(404, "application not found");
+
+    const professors = await this.supervisorRepo.findAll(choices);
+    if (professors.length < 3)
+      return makeHttpError(404, "could not found professor");
+    const supervisors = await this.choiceRepo.create(
+      application.id,
+      choices as number[]
+    );
+
+    if (!supervisors) return makeHttpError(500, "could not add Supervisors");
+
+    return makeHttpResponse(201, { supervisors });
+  }
 
   async getApplicationById(req: httpRequest): Promise<any> {
     const {
       value: { id },
       error,
-    } = IntershipProcessServiceValidator.idSchema.validate(req.pathParams);
+    } = ApplicationValidation.idSchema.validate(req.pathParams);
 
     if (error) return makeHttpError(400, "bad id");
 
@@ -61,48 +85,51 @@ export default class StudentProcessApplicationService
 
   async submitApplication(req: httpRequest): Promise<any> {
     try {
-      //check comany
+      const studentId = req.body.user.id;
+      const {
+        companyId,
+        companyName,
+        intern_department,
+        internCompanySupervisorName,
+        internCompanySupervisorAddress,
+        internCompanySupervisorPhone,
+      } = req.body;
 
-      const intPros = new InternshipProcess(
-        req.body.codeSujet,
-        req.body.student,
-        req.body.company,
-        req.body.department,
-        req.body.universatySupervisor,
-        req.body.companySupervisorName,
-        req.body.companySupervisorAddress,
-        req.body.companySupervisorPhone,
-        req.body.choices
-      );
-      //student & codeSujet
-
-      if (intPros.company === null) {
-        const newCompany = new Company(
-          req.queryParams.companyName,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null
-        );
-        await this.companyRepo.save(newCompany);
-        intPros.company = newCompany;
-      } else {
-        // Check if a company with the given object already exists
-
-        const company = await this.companyRepo.getById(intPros.company.id);
-        if (company!) {
-          console.log("company does not exist");
-          return;
+      const { value, error } = ApplicationValidation.applicationSchema.validate(
+        {
+          studentId,
+          companyId,
+          intern_department,
+          internCompanySupervisorName,
+          internCompanySupervisorAddress,
+          internCompanySupervisorPhone,
         }
+      );
+      if (error) return makeHttpError(400, error.message);
+
+      //student & codeSujet
+      let company: Company = null;
+      if (companyId) {
+        company = await this.companyRepo.getById(companyId);
+        if (!company) makeHttpError(404, "company does not exist");
+      } else {
+        company = await this.companyRepo.create(companyName);
+        if (!company) makeHttpError(500, "Could not add company");
       }
 
-      await this.internProcessRepo.save(intPros);
-      return makeHttpResponse(200, { intPros });
+      const student = await this.studentRepo.getById(studentId);
+
+      const application = await this.internProcessRepo.create(
+        student.id,
+        companyId,
+        intern_department,
+        internCompanySupervisorName,
+        internCompanySupervisorAddress,
+        internCompanySupervisorPhone
+      );
+      if (!application) makeHttpError(500, "Could not add application");
+
+      return makeHttpResponse(200, { application });
     } catch (err) {
       const e: RepoError = err as RepoError;
       console.log(e);
@@ -114,12 +141,10 @@ export default class StudentProcessApplicationService
     const {
       value: { id },
       error: id_error,
-    } = IntershipProcessServiceValidator.idSchema.validate(req.pathParams);
+    } = ApplicationValidation.idSchema.validate(req.pathParams);
     if (id_error) return makeHttpError(400, "bad id");
     const { value, error } =
-      IntershipProcessServiceValidator.updateInternProcessDataSchema.validate(
-        req.body
-      );
+      ApplicationValidation.updateInternProcessDataSchema.validate(req.body);
     if (error) {
       if (error.message.includes("intern_company_supervisor_phone"))
         error.message = "unvalide phone number";

@@ -1,0 +1,22 @@
+{
+  "name": "internship-service",
+  "version": "1.0.0",
+  "endpoints": [
+    {
+      "path": "/subject",
+      "method": "POST",
+      "auth": {
+        "type": "jwt",
+        "roles": ["student"]
+      }
+    },
+    {
+      "path": "/supervisors",
+      "method": "POST",
+      "auth": {
+        "type": "jwt",
+        "roles": ["student"]
+      }
+    }
+  ]
+}

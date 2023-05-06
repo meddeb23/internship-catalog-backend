@@ -1,9 +1,19 @@
-import { ProfessorModel } from "../model";
+import { ProfessorModel, UserModel } from "../model";
 import { RepoError } from "../../helper";
 import { ISupervisorRepo } from "../../core/repositories";
 import { Professor, SupervisorChoice } from "../../core/entities";
 
 export default class SupervisorRepository implements ISupervisorRepo {
+  async findAll(id: number[]): Promise<Professor[]> {
+    const professors = await ProfessorModel.findAll({
+      where: {
+        id,
+      },
+      include: [UserModel],
+    });
+    return professors.map((p) => this.#GetEntityFromModel(p));
+  }
+
   #handleError(err: any, action: string) {
     const error = new RepoError("Error in supervisor Repository");
     err.errors.forEach((e: any) => {
@@ -17,7 +27,17 @@ export default class SupervisorRepository implements ISupervisorRepo {
   }
 
   #GetEntityFromModel(p: ProfessorModel): Professor {
-    return new Professor();
+    return new Professor(
+      p.user.id,
+      p.user.first_name,
+      p.user.last_name,
+      p.user.email,
+      p.user.password,
+      p.user.role,
+      p.user.registration_completed,
+      p.officeLocation,
+      p.department
+    );
   }
 
   async getById(id: number): Promise<Professor> {

@@ -1,35 +1,35 @@
-import TechnicalDomain from "./TechnicalDomain";
-
-export default class Company {
+export default class Enterprise {
   id?: number;
   company_name: string;
-  company_address: string | null;
-  company_city: string | null;
-  company_phone: string | null;
-  company_website: string | null;
-  company_logo_url: string | null;
-  company_linkedin_url: string | null;
-  overview: string | null;
-  specialties: Array<TechnicalDomain> | null;
+  company_address?: string | null;
+  company_city?: string | null;
+  company_phone?: string | null;
+  company_website?: string | null;
+  company_logo_url?: string | null;
+  company_linkedin_url?: string | null;
+  overview?: string | null;
+  specialties?: string | null;
   is_verified: boolean;
 
   constructor(
+    id: number,
     company_name: string,
-    company_address: string | null,
-    company_city: string | null,
-    company_phone: string | null,
-    company_website: string | null,
-    company_logo_url: string | null,
-    company_linkedin_url: string | null,
-    overview: string | null,
-    specialties: Array<TechnicalDomain> | null,
-    is_verified: boolean = false,
-    id?: number
+    company_address?: string | null,
+    company_city?: string | null,
+    company_phone?: string | null,
+    company_website?: string | null,
+    company_logo_url?: string | null,
+    company_linkedin_url?: string | null,
+    overview?: string | null,
+    specialties?: string | null,
+    is_verified: boolean = false
   ) {
     this.company_name = company_name;
     this.company_address = company_address;
     this.company_city = company_city;
-    this.company_phone = company_phone; //.replace(/\s+/g, "");
+    this.company_phone = company_phone
+      ? company_phone.replace(/\s+/g, "")
+      : company_phone;
     this.company_website = company_website;
     this.company_logo_url = company_logo_url;
     this.company_linkedin_url = company_linkedin_url;

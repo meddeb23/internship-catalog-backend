@@ -1,6 +1,9 @@
 import { SupervisorChoice } from "../entities";
 export default interface ISupervisorChoiceRepo {
-  save: (choice: SupervisorChoice) => Promise<void>;
+  create(
+    applicationId: number,
+    professorId: number[]
+  ): Promise<SupervisorChoice[]>;
   getById: (
     intershipProcessId: number,
     professorId: number
