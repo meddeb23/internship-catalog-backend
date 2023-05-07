@@ -111,15 +111,20 @@ export default class RequestHandler {
       };
     if (endpoint.auth) {
       const { user, data, status } = await this.#authCheck(endpoint, req.headers.authorization)
-      console.log(data, status, user)
       if (!user) return { data, status }
       req.body.user = user;
     }
-    console.log(`http://${service.ip}:${service.port}/${path}`)
+    let query = ""
+    Object.keys(req.query).forEach((k, i) => {
+      if (i === 0) query += `?${k}=${req.query[k]}`
+      else query += `&${k}=${req.query[k]}`
+    })
+
+    console.log(`http://${service.ip}:${service.port}/${path}${query}`)
     const { data, headers, status } = await this.callService(
       req.method,
       req.body,
-      `http://${service.ip}:${service.port}/${path}`,
+      `http://${service.ip}:${service.port}/${path}${query}`,
       req.headers,
       req.files
     );

@@ -24,14 +24,14 @@ app.use((req, res, next) => {
   next();
 });
 app.use(morgan("common", {
-  stream: { write: (message) => logger.http(message) },
+  // stream: { write: (message) => logger.http(message) },
   skip: (req, res) => req.path === "/register"
 }));
 
 const registery = new Registery();
 const requestHandler = new RequestHandler();
 
-app.get("/", (req, res) => res.send('<h1>hello world</h1>'))
+app.use("/static", express.static('public'))
 
 app.post("/register", (req, res) => {
   const { value, error } = ServiceRegisteryRequestSchema.validate(req.body);
@@ -81,13 +81,14 @@ app.all("/:service_name/:service_version/*", async (req, res) => {
     return res.status(status).json(data);
   } catch (err) {
     const error = new Error();
-    console.log('stack: ', err.stack);
     if (process.env.NODE_ENV !== "development")
       return res.status(500).send("Something Went wrong 🍥");
 
     if (err.response) {
-      return res.status(err.response.status).send(err.response.data);
+      console.log(`Error (${err.response.status}), message: ${err.response.message}`)
+      return res.status(err.response.status).send(err.stack);
     }
+    console.log('stack: ', err.stack);
     return res.status(500).json({ stack: err.stack + "🍥" });
   }
 });
