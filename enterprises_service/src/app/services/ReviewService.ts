@@ -80,15 +80,35 @@ export default class ReviewService implements IReviewService {
     );
     const isNextPage = reviewsSlice.length > limit;
     const reviews = reviewsSlice.slice(0, limit);
-    return makeHttpResponse(200, { reviews, isNextPage });
+
+    const { avgRating, nbReview } = await this.reviewRepo.getRatingByCompanyId(
+      companyId
+    );
+    return makeHttpResponse(200, {
+      reviews,
+      isNextPage,
+      avgRating,
+      page,
+      nbReview,
+    });
   }
 
   async addReview(req: httpRequest): Promise<any> {
     try {
-      const { value, error } = Validator.reviewSchema.validate(req.body);
-      if (error) return makeHttpError(400, error.message);
+      const {
+        user: { id: userId },
+        companyId,
+        rating,
+        content,
+      } = req.body;
 
-      const { userId, companyId, rating, content } = value;
+      const { value, error } = Validator.reviewSchema.validate({
+        userId,
+        companyId,
+        rating,
+        content,
+      });
+      if (error) return makeHttpError(400, error.message);
 
       const company = await this.enterpriseRepo.getEnterpriseById(companyId);
       if (!company) return makeHttpError(404, "Company does not exist");
@@ -111,7 +131,6 @@ export default class ReviewService implements IReviewService {
         rating,
         companyId
       );
-      console.log(!newReview);
       if (!newReview) return makeHttpError(500, "Review Couldn't be created");
       return makeHttpResponse(200, { review: newReview });
     } catch (err) {

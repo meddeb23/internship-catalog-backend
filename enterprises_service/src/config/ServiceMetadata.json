@@ -63,7 +63,7 @@
     {
       "description": "toggle like companies",
       "path": "/company/like/:companyId",
-      "method": "GET",
+      "method": "POST",
       "params": ["companyId"],
       "auth": {
         "type": "jwt",
@@ -73,7 +73,7 @@
     {
       "description": "toggle save companies",
       "path": "/company/save/:companyId",
-      "method": "GET",
+      "method": "POST",
       "params": ["companyId"],
       "auth": {
         "type": "jwt",

@@ -2,6 +2,7 @@ import { IReviewRepository, User } from "../../core";
 import { ReviewsModel, UserModel } from "../model";
 import { RepoError } from "../../helper";
 import Review from "../../core/entities/Review";
+import { sequelizeModel } from "../../database";
 
 export default class ReviewRepository implements IReviewRepository {
   readonly model: typeof ReviewsModel;
@@ -15,7 +16,6 @@ export default class ReviewRepository implements IReviewRepository {
       include: [UserModel],
     });
     if (!review) return null;
-    console.log(review);
     return this.#getEntity(review);
   }
 
@@ -44,6 +44,19 @@ export default class ReviewRepository implements IReviewRepository {
       limit: limit + 1,
     });
     return reviews.map((i) => this.#getEntity(i));
+  }
+  async getRatingByCompanyId(companyId: number): Promise<any> {
+    const result = await this.model.findOne({
+      attributes: [
+        [sequelizeModel.fn("AVG", sequelizeModel.col("rating")), "avgRating"],
+        [sequelizeModel.fn("COUNT", sequelizeModel.col("id")), "nbReview"],
+      ],
+      where: { companyId },
+    });
+    return {
+      avgRating: (result.get("avgRating") as number) ?? 0,
+      nbReview: (result.get("nbReview") as number) ?? 0,
+    };
   }
 
   async create(
@@ -108,7 +121,14 @@ export default class ReviewRepository implements IReviewRepository {
 
   #getEntity(m: ReviewsModel): Review {
     const user = new User(m.user.id, m.user.first_name, m.user.last_name);
-    return new Review(m.content, m.rating, user, m.companyId, m.id);
+    return new Review(
+      m.content,
+      m.rating,
+      user,
+      m.companyId,
+      m.id,
+      m.createdAt
+    );
   }
 
   #handleError(err: any, action: string) {

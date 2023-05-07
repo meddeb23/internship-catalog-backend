@@ -7,7 +7,6 @@ import {
   RepoError,
 } from "../../helper";
 import { EnterpriseServiceValidator as EnterpriseValidator } from "./validation";
-import { Validate } from "sequelize-typescript";
 
 export interface IEnterpriseService {
   addCompany: (req: httpRequest) => Promise<any>;
@@ -38,6 +37,13 @@ export default class EnterpriseService implements IEnterpriseService {
     const company = await this.enterpriseRepo.getEnterpriseById(companyId);
     if (!company) return makeHttpError(404, "company not found");
 
+    const isLiked = await this.enterpriseRepo.isLikedCompany(id, company.id);
+    if (isLiked) {
+      const unlike = await this.enterpriseRepo.unlikeCompany(id, company.id);
+      if (!unlike) return makeHttpError(500, "could not unlike company");
+      return makeHttpResponse(200, {});
+    }
+
     const like = this.enterpriseRepo.likeCompany(id, company.id);
     if (!like) return makeHttpError(500, "could not like company");
 
@@ -55,6 +61,13 @@ export default class EnterpriseService implements IEnterpriseService {
 
     const company = await this.enterpriseRepo.getEnterpriseById(companyId);
     if (!company) return makeHttpError(404, "company not found");
+
+    const isSaved = await this.enterpriseRepo.isSavedCompany(id, company.id);
+    if (isSaved) {
+      const unsave = await this.enterpriseRepo.unsaveCompany(id, company.id);
+      if (!unsave) return makeHttpError(500, "could not unsave company");
+      return makeHttpResponse(200, {});
+    }
 
     const save = this.enterpriseRepo.saveCompany(id, company.id);
     if (!save) return makeHttpError(500, "could not save company");
@@ -93,11 +106,14 @@ export default class EnterpriseService implements IEnterpriseService {
       value: { id },
       error,
     } = EnterpriseValidator.idSchema.validate(req.pathParams);
-    if (error) return makeHttpError(400, "bad id");
+    if (error) return makeHttpError(404, "bad company id");
+
     const company = await this.enterpriseRepo.getEnterpriseById(id);
     if (!company) return makeHttpError(404, "company not found");
+
     return makeHttpResponse(200, { company });
   }
+
   getValidNumberParam(
     param: string,
     minValue: number,
@@ -113,17 +129,18 @@ export default class EnterpriseService implements IEnterpriseService {
   async getCompaniesPage(req: httpRequest): Promise<any> {
     const page = this.getValidNumberParam(req.queryParams.page, 1);
     const limit = this.getValidNumberParam(req.queryParams.limit, 10);
+
     const is_verify = req.queryParams.verifyOnly === "true";
     const enp_list = await this.enterpriseRepo.getEnterprisePage(
       page,
       limit,
       is_verify
     );
-    console.log(enp_list.length);
 
     return makeHttpResponse(200, {
       companies: enp_list.slice(0, limit),
       isNextPage: enp_list.length > limit,
+      page,
     });
   }
 

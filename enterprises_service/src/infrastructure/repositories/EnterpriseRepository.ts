@@ -18,6 +18,47 @@ export default class EnterpriseRepository implements IEnterpriseRepository {
     this.like = likeCompanyModel;
     this.savec = saveCompanyModel;
   }
+  async isLikedCompany(userId: number, companyId: number): Promise<boolean> {
+    const isLiked = await this.like.findOne({
+      where: {
+        userId,
+        companyId,
+      },
+    });
+    if (!isLiked) return null;
+    return true;
+  }
+  async isSavedCompany(userId: number, companyId: number): Promise<boolean> {
+    const isSaved = await this.savec.findOne({
+      where: {
+        userId,
+        companyId,
+      },
+    });
+    if (!isSaved) return null;
+    return true;
+  }
+  async unlikeCompany(userId: number, companyId: number): Promise<boolean> {
+    const deletedLike = await this.like.destroy({
+      where: {
+        userId,
+        companyId,
+      },
+    });
+    if (!deletedLike) return false;
+    return true;
+  }
+  async unsaveCompany(userId: number, companyId: number): Promise<boolean> {
+    const deletedSave = await this.savec.destroy({
+      where: {
+        userId,
+        companyId,
+      },
+    });
+    if (!deletedSave) return false;
+    return true;
+  }
+
   async likeCompany(userId: number, companyId: number): Promise<boolean> {
     const like = await this.like.create({ userId, companyId });
     if (!like) return null;
@@ -99,7 +140,6 @@ export default class EnterpriseRepository implements IEnterpriseRepository {
   ): Promise<Enterprise[]> {
     const where: any = {};
     if (isVerify) where.is_verified = isVerify;
-    console.log(typeof page, typeof limit);
     const enps = await EnterpriseModel.findAll({
       offset: (page - 1) * limit,
       limit: limit + 1,

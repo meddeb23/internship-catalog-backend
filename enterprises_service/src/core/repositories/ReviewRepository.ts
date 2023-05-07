@@ -13,4 +13,5 @@ export default interface IReviewRepository {
   ): Promise<Review>;
   delete(reviewId: number): Promise<number>;
   update(reviewId: number, content: string, rating: number): Promise<Review>;
+  getRatingByCompanyId(companyId: number): Promise<any>;
 }

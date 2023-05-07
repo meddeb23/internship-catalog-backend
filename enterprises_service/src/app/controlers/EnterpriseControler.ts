@@ -27,8 +27,8 @@ router.put(
   makeEnterpriseController("updateCompanyData", service)
 );
 router.get("/", makeEnterpriseController("getCompaniesPage", service));
-router.get("/like/:id", makeEnterpriseController("likeCompany", service));
-router.get("/save/:id", makeEnterpriseController("SaveCompany", service));
+router.post("/like/:id", makeEnterpriseController("likeCompany", service));
+router.post("/save/:id", makeEnterpriseController("SaveCompany", service));
 router.get("/:id", makeEnterpriseController("getCompanyById", service));
 router.get("/q/:query", makeEnterpriseController("autoComplete", service));
 
